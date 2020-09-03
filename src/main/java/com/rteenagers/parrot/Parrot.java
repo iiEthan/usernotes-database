@@ -2,7 +2,8 @@ package com.rteenagers.parrot;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class MainPlugin extends JavaPlugin {
+public final class Parrot extends JavaPlugin {
+
     @Override
     public void onEnable() {
         getLogger().info("Parrot has been enabled!");

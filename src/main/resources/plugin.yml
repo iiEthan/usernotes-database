@@ -1,0 +1,5 @@
+name: Parrot
+version: ${project.version}
+main: com.rteenagers.parrot.Parrot
+api-version: "1.16"
+description: Fetches google usernotes in-game
