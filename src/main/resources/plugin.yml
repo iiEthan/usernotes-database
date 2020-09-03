@@ -1,5 +1,5 @@
 name: Parrot
-version: ${project.version}
+version: @version@
 main: com.rteenagers.parrot.Parrot
-api-version: "1.16"
-description: Fetches google usernotes in-game
+api-version: 1.16
+description: Fetches sheets for in-game use
