@@ -22,7 +22,7 @@ public class SheetsFetcherCommand implements CommandExecutor {
         Arrays.toString(args);
 
         try {
-            SheetsQuickstart.main(args[0]);
+            SheetsQuickstart.main(sender, args[0]);
         } catch (IOException | GeneralSecurityException e) {
             e.printStackTrace();
         }

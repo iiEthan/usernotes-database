@@ -13,6 +13,8 @@ import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.ValueRange;
+import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -62,13 +64,13 @@ public class SheetsQuickstart {
      * Prints the names and majors of students in a sample spreadsheet:
      * https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
      */
-    public static void main(String... args) throws IOException, GeneralSecurityException {
+    public static void main(CommandSender sender, String... args) throws IOException, GeneralSecurityException {
         String player = args[0];
 
         // Build a new authorized API client service.
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-        final String spreadsheetId = "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms";
-        final String range = "Class Data!A2:E";
+        final String spreadsheetId = "1hN-TMFeBXOWET5AO8_AQ2ATMZboRLX5VWps2U71B73w";
+        final String range = "Bans!A3:E";
         Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
                 .setApplicationName(APPLICATION_NAME)
                 .build();
@@ -77,11 +79,15 @@ public class SheetsQuickstart {
                 .execute();
         List<List<Object>> values = response.getValues();
         if (values == null || values.isEmpty()) {
-            System.out.println("No data found.");
+            sender.sendMessage("No data found.");
         } else {
-            System.out.println("Name, Major");
-            // Print columns A and E, which correspond to indices 0 and 4.
-            values.forEach(row -> System.out.printf("%s, %s\n", row.get(0), row.get(4)));
+            for (List row : values) {
+                String userCheck = row.get(0).toString().toLowerCase();
+
+                if (userCheck.equals(player.toLowerCase())) {
+                    sender.sendMessage(ChatColor.RED + "TRUE");
+                }
+            }
         }
     }
 }
