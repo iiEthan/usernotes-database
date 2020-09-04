@@ -8,7 +8,7 @@ public final class Parrot extends JavaPlugin {
     public void onEnable() {
 
         // Register our commands
-        getCommand("pleasework").setExecutor(new SheetsFetcherCommand());
+        getCommand("notes").setExecutor(new SheetsFetcherCommand());
 
         getLogger().info("Parrot has been enabled!");
 

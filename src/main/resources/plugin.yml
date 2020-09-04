@@ -5,6 +5,6 @@ api-version: "1.16"
 description: Fetches sheets for in-game use
 
 commands:
-  pleasework:
+  notes:
     description: test command
-    usage: "/pleasework"
+    usage: "/notes [player]"
