@@ -5,16 +5,22 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
-public class SheetsFetcherCommand implements CommandExecutor {
-    private final Parrot plugin;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 
-    public SheetsFetcherCommand(Parrot plugin) {
-        this.plugin = plugin;
-    }
+public class SheetsFetcherCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        sender.sendMessage(ChatColor.RED + " Hello " + sender.getName());
+
+        try {
+            SheetsQuickstart.main();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+        }
+
         return true;
     }
 }
