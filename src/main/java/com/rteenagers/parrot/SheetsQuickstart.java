@@ -61,41 +61,63 @@ public class SheetsQuickstart {
     }
 
     /**
-     * Prints the names and majors of students in a sample spreadsheet:
-     * https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
+     * Prints mute/ban logs in spreadsheet:
+     * https://docs.google.com/spreadsheets/d/1hN-TMFeBXOWET5AO8_AQ2ATMZboRLX5VWps2U71B73/edit
      */
+    @SuppressWarnings("rawtypes")
     public static void main(CommandSender sender, String... args) throws IOException, GeneralSecurityException {
         String player = args[0];
 
         // Build a new authorized API client service.
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         final String spreadsheetId = "1hN-TMFeBXOWET5AO8_AQ2ATMZboRLX5VWps2U71B73w";
-        final String range = "Bans!A3:H";
+        final String banRange = "Bans!A3:H";
         Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
                 .setApplicationName(APPLICATION_NAME)
                 .build();
-        ValueRange response = service.spreadsheets().values()
-                .get(spreadsheetId, range)
+        ValueRange banResponse = service.spreadsheets().values()
+                .get(spreadsheetId, banRange)
                 .execute();
-        List<List<Object>> values = response.getValues();
-        if (values == null || values.isEmpty()) {
-            sender.sendMessage("No data found.");
-        } else {
-            sender.sendMessage(ChatColor.RED + "Ban Logs for " + ChatColor.AQUA + player + ChatColor.RED + ":");
-            String totalPoints = "0";
-            for (List row : values) {
-                String userCheck = row.get(0).toString().toLowerCase();
+        List<List<Object>> banValues = banResponse.getValues();
 
-                if (userCheck.equals(player.toLowerCase())) {
-                    totalPoints = row.get(3).toString();
-                    sender.sendMessage(ChatColor.GREEN + row.get(7).toString() + ": " +                                  /* Date */
-                                       ChatColor.GOLD + "Infraction: " + ChatColor.AQUA + row.get(1).toString() + " " +  /* Infraction */
-                                       ChatColor.GOLD + "Action: " + ChatColor.AQUA + row.get(6).toString() + " " +      /* Action */
-                                       ChatColor.GOLD + "Mod: " + ChatColor.AQUA + row.get(5).toString() + " "           /* Moderator */
-                    );
-                }
+        final String muteRange = "Mutes!A3:H";
+        ValueRange muteResponse = service.spreadsheets().values()
+                .get(spreadsheetId, muteRange)
+                .execute();
+        List<List<Object>> muteValues = muteResponse.getValues();
+
+        String totalMutePoints = "0";
+        String totalBanPoints = "0";
+
+        sender.sendMessage(ChatColor.RED + "Mute Logs for " + ChatColor.AQUA + player + ChatColor.RED + ":");
+        // Gets mute logs from spreadsheet
+        for (List row : muteValues) {
+            String userCheck = row.get(0).toString().toLowerCase();
+            if (userCheck.equals(player.toLowerCase())) {
+                totalMutePoints = row.get(3).toString();
+
+                sender.sendMessage(ChatColor.GREEN + row.get(7).toString() + ": " +                            /* Date */
+                        ChatColor.GOLD + "Infraction: " + ChatColor.AQUA + row.get(1).toString() + " " +       /* Infraction */
+                        ChatColor.GOLD + "Action: " + ChatColor.AQUA + row.get(6).toString() + " " +           /* Action */
+                        ChatColor.GOLD + "Mod: " + ChatColor.AQUA + row.get(5).toString() + " ");              /* Moderator */
             }
-            sender.sendMessage(ChatColor.GOLD + "Total points: " + ChatColor.AQUA + totalPoints);      /* Total Points */
         }
+
+        sender.sendMessage(ChatColor.RED + "Ban Logs for " + ChatColor.AQUA + player + ChatColor.RED + ":");
+        // Gets ban logs from spreadsheet
+        for (List row : banValues) {
+            String userCheck = row.get(0).toString().toLowerCase();
+            if (userCheck.equals(player.toLowerCase())) {
+                totalBanPoints = row.get(3).toString();
+
+                sender.sendMessage(ChatColor.GREEN + row.get(7).toString() + ": " +                            /* Date */
+                        ChatColor.GOLD + "Infraction: " + ChatColor.AQUA + row.get(1).toString() + " " +       /* Infraction */
+                        ChatColor.GOLD + "Action: " + ChatColor.AQUA + row.get(6).toString() + " " +           /* Action */
+                        ChatColor.GOLD + "Mod: " + ChatColor.AQUA + row.get(5).toString() + " ");              /* Moderator */
+            }
+        }
+        // These must be outside of the forEach loop because we only want them to print once
+        sender.sendMessage(ChatColor.GOLD + "Total mute points: " + ChatColor.AQUA + totalMutePoints);
+        sender.sendMessage(ChatColor.GOLD + "Total ban points: " + ChatColor.AQUA + totalBanPoints);
     }
 }
