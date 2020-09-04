@@ -70,7 +70,7 @@ public class SheetsQuickstart {
         // Build a new authorized API client service.
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
         final String spreadsheetId = "1hN-TMFeBXOWET5AO8_AQ2ATMZboRLX5VWps2U71B73w";
-        final String range = "Bans!A3:E";
+        final String range = "Bans!A3:H";
         Sheets service = new Sheets.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
                 .setApplicationName(APPLICATION_NAME)
                 .build();
@@ -81,13 +81,21 @@ public class SheetsQuickstart {
         if (values == null || values.isEmpty()) {
             sender.sendMessage("No data found.");
         } else {
+            sender.sendMessage(ChatColor.RED + "Ban Logs for " + ChatColor.AQUA + player + ChatColor.RED + ":");
+            String totalPoints = "0";
             for (List row : values) {
                 String userCheck = row.get(0).toString().toLowerCase();
 
                 if (userCheck.equals(player.toLowerCase())) {
-                    sender.sendMessage(ChatColor.RED + "TRUE");
+                    totalPoints = row.get(3).toString();
+                    sender.sendMessage(ChatColor.GREEN + row.get(7).toString() + ": " +                                  /* Date */
+                                       ChatColor.GOLD + "Infraction: " + ChatColor.AQUA + row.get(1).toString() + " " +  /* Infraction */
+                                       ChatColor.GOLD + "Action: " + ChatColor.AQUA + row.get(6).toString() + " " +      /* Action */
+                                       ChatColor.GOLD + "Mod: " + ChatColor.AQUA + row.get(5).toString() + " "           /* Moderator */
+                    );
                 }
             }
+            sender.sendMessage(ChatColor.GOLD + "Total points: " + ChatColor.AQUA + totalPoints);      /* Total Points */
         }
     }
 }

@@ -11,7 +11,6 @@ public final class Parrot extends JavaPlugin {
         getCommand("notes").setExecutor(new SheetsFetcherCommand());
 
         getLogger().info("Parrot has been enabled!");
-
     }
 
     @Override
