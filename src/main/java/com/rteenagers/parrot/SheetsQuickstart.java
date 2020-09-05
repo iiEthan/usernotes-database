@@ -89,7 +89,7 @@ public class SheetsQuickstart {
         String totalMutePoints = "0";
         String totalBanPoints = "0";
 
-        sender.sendMessage(ChatColor.RED + "Mute Logs for " + ChatColor.AQUA + player + ChatColor.RED + ":");
+        sender.sendMessage(ChatColor.RED + "Mute Logs for " + ChatColor.DARK_AQUA + player + ChatColor.RED + ":");
         // Gets mute logs from spreadsheet
         for (List row : muteValues) {
             String userCheck = row.get(0).toString().toLowerCase();
@@ -97,13 +97,13 @@ public class SheetsQuickstart {
                 totalMutePoints = row.get(3).toString();
 
                 sender.sendMessage(ChatColor.GREEN + row.get(7).toString() + ": " +                            /* Date */
-                        ChatColor.GOLD + "Infraction: " + ChatColor.AQUA + row.get(1).toString() + " " +       /* Infraction */
-                        ChatColor.GOLD + "Action: " + ChatColor.AQUA + row.get(6).toString() + " " +           /* Action */
-                        ChatColor.GOLD + "Mod: " + ChatColor.AQUA + row.get(5).toString() + " ");              /* Moderator */
+                        ChatColor.BLUE + "Infraction: " + ChatColor.DARK_AQUA + row.get(1).toString() + " " +       /* Infraction */
+                        ChatColor.BLUE + "Action: " + ChatColor.DARK_AQUA + row.get(6).toString() + " " +           /* Action */
+                        ChatColor.BLUE + "Mod: " + ChatColor.DARK_AQUA + row.get(5).toString() + " ");              /* Moderator */
             }
         }
 
-        sender.sendMessage(ChatColor.RED + "Ban Logs for " + ChatColor.AQUA + player + ChatColor.RED + ":");
+        sender.sendMessage(ChatColor.RED + "Ban Logs for " + ChatColor.DARK_AQUA + player + ChatColor.RED + ":");
         // Gets ban logs from spreadsheet
         for (List row : banValues) {
             String userCheck = row.get(0).toString().toLowerCase();
@@ -111,13 +111,13 @@ public class SheetsQuickstart {
                 totalBanPoints = row.get(3).toString();
 
                 sender.sendMessage(ChatColor.GREEN + row.get(7).toString() + ": " +                            /* Date */
-                        ChatColor.GOLD + "Infraction: " + ChatColor.AQUA + row.get(1).toString() + " " +       /* Infraction */
-                        ChatColor.GOLD + "Action: " + ChatColor.AQUA + row.get(6).toString() + " " +           /* Action */
-                        ChatColor.GOLD + "Mod: " + ChatColor.AQUA + row.get(5).toString() + " ");              /* Moderator */
+                        ChatColor.BLUE + "Infraction: " + ChatColor.DARK_AQUA + row.get(1).toString() + " " +       /* Infraction */
+                        ChatColor.BLUE + "Action: " + ChatColor.DARK_AQUA + row.get(6).toString() + " " +           /* Action */
+                        ChatColor.BLUE + "Mod: " + ChatColor.DARK_AQUA + row.get(5).toString() + " ");              /* Moderator */
             }
         }
         // These must be outside of the forEach loop because we only want them to print once
-        sender.sendMessage(ChatColor.GOLD + "Total mute points: " + ChatColor.AQUA + totalMutePoints);
-        sender.sendMessage(ChatColor.GOLD + "Total ban points: " + ChatColor.AQUA + totalBanPoints);
+        sender.sendMessage(ChatColor.BLUE + "Total mute points: " + ChatColor.DARK_AQUA + totalMutePoints);
+        sender.sendMessage(ChatColor.BLUE + "Total ban points: " + ChatColor.DARK_AQUA + totalBanPoints);
     }
 }
