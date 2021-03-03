@@ -13,6 +13,7 @@ version = '1.0'
 
 repositories {
     mavenCentral()
+    google()
     maven {
         name = 'spigotmc-repo'
         url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
@@ -24,10 +25,8 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'org.spigotmc:spigot-api:1.16.1-R0.1-SNAPSHOT'
-    compile 'com.google.api-client:google-api-client:1.30.4'
-    compile 'com.google.oauth-client:google-oauth-client-jetty:1.30.6'
-    compile 'com.google.apis:google-api-services-sheets:v4-rev581-1.25.0'
+    compile 'org.spigotmc:spigot-api:1.16.1-R0.1-SNAPSHOT'
+    implementation 'com.google.firebase:firebase-admin:7.1.0'
 }
 
 processResources {
@@ -35,3 +34,12 @@ processResources {
         filter ReplaceTokens, tokens: [version: version]
     }
 }
+
+buildscript {
+    repositories { jcenter() }
+    dependencies {
+        classpath 'com.netflix.nebula:gradle-lint-plugin:latest.release'
+    }
+}
+
+apply plugin: 'nebula.lint'

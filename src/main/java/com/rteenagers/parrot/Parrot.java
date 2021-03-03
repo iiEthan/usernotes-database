@@ -7,8 +7,12 @@ public final class Parrot extends JavaPlugin {
     @Override
     public void onEnable() {
 
-        // Register our commands
-        getCommand("notes").setExecutor(new SheetsFetcherCommand());
+        // Register command
+        getCommand("notes").setExecutor(new NotesCommand());
+
+        // Initialize database
+        System.out.println("Initializing database...");
+        FirebaseHandler.start();
 
         getLogger().info("Parrot has been enabled!");
     }
