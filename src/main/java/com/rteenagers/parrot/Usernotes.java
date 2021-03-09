@@ -2,6 +2,7 @@ package com.rteenagers.parrot;
 
 import com.rteenagers.parrot.commands.PointCommand;
 import com.rteenagers.parrot.commands.PointsCommand;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.Connection;

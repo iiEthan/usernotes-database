@@ -3,7 +3,6 @@ package com.rteenagers.parrot;
 import org.bukkit.command.CommandSender;
 import org.postgresql.util.PSQLException;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -14,10 +13,11 @@ public class DatabaseHandler {
 
     static Connection connection;
     static Statement statement;
+    // ENTER DB INFO BELOW IN THE FORMAT: jdbc:language://host:port/db?user=username&password=password
     public static String connectionURL = "jdbc:postgresql://usernotes.ctlynjuzcvj9.us-east-1.rds.amazonaws.com:5432/postgres?user=root&password=WVZWLFup4OHPzbKHLg0T";
 
     public static void openConnection() throws SQLException, ClassNotFoundException {
-        
+
         Class.forName("org.postgresql.Driver");
         connection = DriverManager.getConnection(DatabaseHandler.connectionURL);
         try {
