@@ -1,28 +1,71 @@
 package com.rteenagers.parrot;
 
 import org.bukkit.command.CommandSender;
+import org.postgresql.util.PSQLException;
 
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.UUID;
 
 public class DatabaseHandler {
 
     static Connection connection;
+    static Statement statement;
+    public static String connectionURL = "jdbc:postgresql://usernotes.ctlynjuzcvj9.us-east-1.rds.amazonaws.com:5432/postgres?user=root&password=WVZWLFup4OHPzbKHLg0T";
 
-    public static void openConnection(String host, String port, String database, String username, String password) throws SQLException,
-            ClassNotFoundException {
-        if (connection != null && !connection.isClosed()) {
-            return;
-        }
+    public static void openConnection() throws SQLException, ClassNotFoundException {
+        
         Class.forName("org.postgresql.Driver");
-        connection = DriverManager.getConnection("jdbc:postgresql://"
-                        + host+ ":" + port + "/" + database,
-                username, password);
+        connection = DriverManager.getConnection(DatabaseHandler.connectionURL);
+        try {
+            createTables();
+        } catch (PSQLException ignored) {}
     }
 
-    public static void main(CommandSender sender, String... args) throws IOException {
+    // Creates the tables if there aren't any already (may need to remove foreign keys first then re-add them)
+    private static void createTables() throws SQLException {
+        statement = connection.createStatement();
+        statement.executeUpdate("CREATE TABLE IF NOT EXISTS users " +
+                "(uuid VARCHAR (50) PRIMARY KEY NOT NULL," +
+                "banID INT," +
+                "muteID INT)"
+        );
+        statement.executeUpdate("CREATE TABLE IF NOT EXISTS bans " +
+                "(banID INT PRIMARY KEY NOT NULL," +
+                "uuid VARCHAR (50)," +
+                "date TIMESTAMP," +
+                "decayed BOOLEAN," +
+                "mod VARCHAR (50)," +
+                "reason VARCHAR (255))"
+        );
+        statement.executeUpdate("CREATE TABLE IF NOT EXISTS mutes " +
+                "(muteID INT PRIMARY KEY NOT NULL," +
+                "uuid VARCHAR (50)," +
+                "date TIMESTAMP," +
+                "decayed BOOLEAN," +
+                "mod VARCHAR (50)," +
+                "reason VARCHAR (255))"
+        );
+
+        statement.executeUpdate("ALTER TABLE bans ADD CONSTRAINT bans_uuid_fk FOREIGN KEY (uuid) REFERENCES users (uuid)");
+        statement.executeUpdate("ALTER TABLE mutes ADD CONSTRAINT mutes_uuid_fk FOREIGN KEY (uuid) REFERENCES users (uuid)");
+        statement.executeUpdate("ALTER TABLE users ADD CONSTRAINT uuid_bans_fk FOREIGN KEY (banID) REFERENCES bans (banID)");
+        statement.executeUpdate("ALTER TABLE users ADD CONSTRAINT uuid_mutes_fk FOREIGN KEY (muteID) REFERENCES mutes (muteID)");
+
+    }
+
+    public static void getPlayer(UUID uuid) {
+        System.out.println(uuid);
+    }
+
+    public static void addPlayer(UUID uuid) {
+
+    }
+
+    public static void main(CommandSender sender, String... args) {
     //temporary
         sender.sendMessage("it works woohoo");
     }

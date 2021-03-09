@@ -5,6 +5,9 @@ api-version: "1.16"
 description: Fetches sheets for in-game use
 
 commands:
-  notes:
+  points:
     description: Usernotes lookup command
-    usage: "/notes [player]"
+    usage: "/points [user]"
+  point:
+    description: Usernotes manager
+    usage: "/point [user] [amount] [reason]"
