@@ -6,7 +6,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.Arrays;
 
 public class NotesCommand implements CommandExecutor {
@@ -22,11 +21,10 @@ public class NotesCommand implements CommandExecutor {
         Arrays.toString(args);
 
         try {
-            FirebaseHandler.main(sender, args[0]);
+            DatabaseHandler.main(sender, args);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
 
         return true;
     }

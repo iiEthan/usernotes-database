@@ -1,34 +1,29 @@
 package com.rteenagers.parrot;
 
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.FirebaseOptions;
 import org.bukkit.command.CommandSender;
 
-import java.io.*;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
-public class FirebaseHandler {
+public class DatabaseHandler {
 
-    public static void start() {
-        {
-            try {
-                InputStream serviceAccount = FirebaseHandler.class.getResourceAsStream("/serviceAccountKey.json");
+    static Connection connection;
 
-                FirebaseOptions options = FirebaseOptions.builder()
-                        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                        .setDatabaseUrl("https://usernotes-database-default-rtdb.firebaseio.com")
-                        .build();
-
-                FirebaseApp.initializeApp(options);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+    public static void openConnection(String host, String port, String database, String username, String password) throws SQLException,
+            ClassNotFoundException {
+        if (connection != null && !connection.isClosed()) {
+            return;
         }
+        Class.forName("org.postgresql.Driver");
+        connection = DriverManager.getConnection("jdbc:postgresql://"
+                        + host+ ":" + port + "/" + database,
+                username, password);
     }
 
     public static void main(CommandSender sender, String... args) throws IOException {
-
+    //temporary
         sender.sendMessage("it works woohoo");
     }
 }

@@ -1,6 +1,6 @@
-name: Parrot
+name: Usernotes
 version: 0.0.3
-main: com.rteenagers.parrot.Parrot
+main: com.rteenagers.parrot.Usernotes
 api-version: "1.16"
 description: Fetches sheets for in-game use
 
