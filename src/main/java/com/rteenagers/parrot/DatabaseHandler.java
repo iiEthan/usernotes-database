@@ -1,13 +1,11 @@
 package com.rteenagers.parrot;
 
-import org.bukkit.command.CommandSender;
 import org.postgresql.util.PSQLException;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.UUID;
 
 public class DatabaseHandler {
 
@@ -22,14 +20,15 @@ public class DatabaseHandler {
         connection = DriverManager.getConnection(DatabaseHandler.connectionURL);
         try {
             createTables();
-        } catch (PSQLException ignored) {}
+        } catch (PSQLException ignored) {
+        }
     }
 
     // Creates the tables if there aren't any already (may need to remove foreign keys first then re-add them)
     private static void createTables() throws SQLException {
         statement = connection.createStatement();
         statement.executeUpdate("CREATE TABLE IF NOT EXISTS users " +
-                "(uuid VARCHAR (50) PRIMARY KEY NOT NULL," +
+                "(uuid VARCHAR (36) PRIMARY KEY NOT NULL," +
                 "banID INT," +
                 "muteID INT)"
         );
@@ -55,19 +54,24 @@ public class DatabaseHandler {
         statement.executeUpdate("ALTER TABLE users ADD CONSTRAINT uuid_bans_fk FOREIGN KEY (banID) REFERENCES bans (banID)");
         statement.executeUpdate("ALTER TABLE users ADD CONSTRAINT uuid_mutes_fk FOREIGN KEY (muteID) REFERENCES mutes (muteID)");
 
+        statement.close();
+        System.out.println("Created new tables");
     }
 
-    public static void getPlayer(UUID uuid) {
+    public static void getNotes(String uuid) {
+        // TODO: CRY A LOT
         System.out.println(uuid);
     }
 
-    public static void addPlayer(UUID uuid) {
+    public static void addNotes(String uuid) throws SQLException {
+        statement = connection.createStatement();
 
-    }
+        // Add user in table if not already in it
+        statement.executeUpdate( "INSERT INTO users (uuid) " +
+                "SELECT '" + uuid + "' WHERE NOT EXISTS (" +
+                "select * FROM users WHERE uuid='" + uuid + "');");
 
-    public static void main(CommandSender sender, String... args) {
-    //temporary
-        sender.sendMessage("it works woohoo");
+        statement.close();
     }
 }
         /*String latestMutePoints = "0";

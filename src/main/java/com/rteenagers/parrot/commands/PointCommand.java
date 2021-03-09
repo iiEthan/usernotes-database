@@ -8,24 +8,26 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.sql.Array;
+import java.sql.SQLException;
+import java.util.*;
 
 public class PointCommand implements TabExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
-        if (args.length == 0) { // User must give an input
-            sender.sendMessage(ChatColor.RED + "Please provide more arguments!");
+        if (args.length < 3) { // User must give an input
+            sender.sendMessage(ChatColor.RED + "Please provide more arguments! Usage is /point [ban/mute/warn] [player] [amount] [reason]");
            return true;
         }
 
-        Arrays.toString(args);
-
-        DatabaseHandler.main(sender, args);
+        UUID player = Bukkit.getOfflinePlayer(args[0]).getUniqueId();
+        try {
+            DatabaseHandler.addNotes(String.valueOf(player));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         return true;
     }
@@ -33,29 +35,47 @@ public class PointCommand implements TabExecutor {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equalsIgnoreCase("point")) {
-            if (args.length == 1) {
-                ArrayList<String> arguments = new ArrayList<>();
-                if (!args[0].equals("")) {
-                    for (Player p : Bukkit.getOnlinePlayers()) {
-                        if (p.getName().toLowerCase().startsWith(args[0].toLowerCase())) {
+
+            ArrayList<String> arguments = new ArrayList<>();
+            switch (args.length) {
+                case 1:
+                    String[] punishments = {"ban", "mute", "warn"};
+                    for (String p : punishments) {
+                        if (p.startsWith(args[0].toLowerCase())) {
+                            arguments.add(p);
+                        }
+                    }
+                    return arguments;
+
+                    case 2:
+                    if (!args[1].equals("")) {
+                        for (Player p : Bukkit.getOnlinePlayers()) {
+                            if (p.getName().toLowerCase().startsWith(args[1].toLowerCase())) {
+                                arguments.add(p.getName());
+                            }
+                        }
+                    } else {
+                        for (Player p : Bukkit.getOnlinePlayers()) {
                             arguments.add(p.getName());
                         }
                     }
-                } else {
-                    for (Player p : Bukkit.getOnlinePlayers()) {
-                        arguments.add(p.getName());
+                    Collections.sort(arguments);
+
+                    return arguments;
+
+                    case 3:
+                    for (int i = 1; i<10; i++) {
+                        arguments.add(String.valueOf(i));
                     }
-                }
-                Collections.sort(arguments);
+                    Collections.sort(arguments);
+                    return arguments;
 
-                return arguments;
-            }
-            if (args.length > 1) {
-                ArrayList<String> arguments = new ArrayList<String>();
+                    case 4:
+                        arguments.add("reason");
+                        return arguments;
 
-                //TODO
-
-                return arguments;
+                default:
+                    return new ArrayList<>();
             }
         }
         return null;

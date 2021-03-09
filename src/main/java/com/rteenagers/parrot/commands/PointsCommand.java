@@ -27,7 +27,7 @@ public class PointsCommand implements TabExecutor {
         OfflinePlayer op = Bukkit.getOfflinePlayer(target); // Deprecated but should work without worry of it being removed, please replace if there's a better way :^)
         if (op.hasPlayedBefore()) {
             UUID uuid = op.getUniqueId();
-            DatabaseHandler.getPlayer(uuid);
+            DatabaseHandler.getNotes(String.valueOf(uuid));
         } else {
             sender.sendMessage(ChatColor.RED + "Player not found. Please check spelling or if they have changed their username.");
         }
@@ -56,8 +56,7 @@ public class PointsCommand implements TabExecutor {
                 return arguments;
             }
             if (args.length > 1) {
-                ArrayList<String> arguments = new ArrayList<String>();
-                return arguments;
+                return new ArrayList<>();
             }
         }
         return null;
