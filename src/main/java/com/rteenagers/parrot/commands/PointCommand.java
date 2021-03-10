@@ -1,6 +1,7 @@
 package com.rteenagers.parrot.commands;
 
 import com.rteenagers.parrot.DatabaseHandler;
+import com.rteenagers.parrot.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -19,16 +20,23 @@ public class PointCommand implements TabExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
-        if (args.length < 3) { // User must give an input
+        if (args.length < 4) { // User must give an input
             sender.sendMessage(ChatColor.RED + "Please provide more arguments! Usage is /point [ban/mute/warn] [player] [amount] [reason]");
            return true;
         }
 
+        if (!Utils.isInteger(args[2])) { // Check if point is valid
+            sender.sendMessage(ChatColor.RED + "Please provide a valid number as your third argument.");
+            return true;
+        }
+
+        // Parses reason into its own string
         StringBuilder reason = new StringBuilder();
         for (int i = 3; i<args.length; i++) {
             reason.append(args[i]).append(" ");
         }
 
+        @SuppressWarnings("deprecation")
         UUID player = Bukkit.getOfflinePlayer(args[1]).getUniqueId();
         String punishmentType;
         switch (args[0]) {
@@ -49,7 +57,7 @@ public class PointCommand implements TabExecutor {
                 return true;
             }
         try {
-            DatabaseHandler.addPoint(punishmentType, String.valueOf(player), sender.getName(), reason.toString(), args[2], args[0].startsWith("warn"));
+            DatabaseHandler.addPoints(args[1], punishmentType, String.valueOf(player), sender.getName(), reason.toString(), args[2], args[0].startsWith("warn"), sender);
         } catch (SQLException e) {
             e.printStackTrace();
         }
