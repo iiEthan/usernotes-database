@@ -8,9 +8,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
-import java.sql.Array;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 public class PointCommand implements TabExecutor {
 
@@ -22,9 +24,32 @@ public class PointCommand implements TabExecutor {
            return true;
         }
 
-        UUID player = Bukkit.getOfflinePlayer(args[0]).getUniqueId();
+        StringBuilder reason = new StringBuilder();
+        for (int i = 3; i<args.length; i++) {
+            reason.append(args[i]).append(" ");
+        }
+
+        UUID player = Bukkit.getOfflinePlayer(args[1]).getUniqueId();
+        String punishmentType;
+        switch (args[0]) {
+            case "ban":
+
+            case "warnban":
+                punishmentType = "bans";
+                break;
+
+            case "mute":
+
+            case "warnmute":
+                punishmentType = "mutes";
+                break;
+
+            default:
+                sender.sendMessage(ChatColor.RED + "Invalid syntax. Please enter " + ChatColor.DARK_RED + "[ban/mute/warnban/warnmute] " + ChatColor.RED + "as the first argument.");
+                return true;
+            }
         try {
-            DatabaseHandler.addNotes(String.valueOf(player));
+            DatabaseHandler.addPoint(punishmentType, String.valueOf(player), sender.getName(), reason.toString(), args[2], args[0].startsWith("warn"));
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -39,7 +64,7 @@ public class PointCommand implements TabExecutor {
             ArrayList<String> arguments = new ArrayList<>();
             switch (args.length) {
                 case 1:
-                    String[] punishments = {"ban", "mute", "warn"};
+                    String[] punishments = {"ban", "mute", "warnban", "warnmute"};
                     for (String p : punishments) {
                         if (p.startsWith(args[0].toLowerCase())) {
                             arguments.add(p);
@@ -64,14 +89,16 @@ public class PointCommand implements TabExecutor {
                     return arguments;
 
                     case 3:
-                    for (int i = 1; i<10; i++) {
+                    for (int i = 0; i<10; i++) {
                         arguments.add(String.valueOf(i));
                     }
                     Collections.sort(arguments);
                     return arguments;
 
                     case 4:
-                        arguments.add("reason");
+                        if (args[3].equals("")) {
+                            arguments.add("reason");
+                        }
                         return arguments;
 
                 default:

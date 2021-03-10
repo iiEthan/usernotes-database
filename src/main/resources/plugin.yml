@@ -10,4 +10,4 @@ commands:
     usage: "/points [user]"
   point:
     description: Usernotes manager
-    usage: "/point [ban/mute/warn] [user] [amount] [reason]"
+    usage: "/point [ban/mute/warnban/warnmute] [user] [amount] [reason]"
