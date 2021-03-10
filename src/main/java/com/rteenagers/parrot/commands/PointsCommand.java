@@ -58,7 +58,7 @@ public class PointsCommand implements TabExecutor {
                 return arguments;
             }
             if (args.length > 1) {
-                return new ArrayList<>();
+                return null;
             }
         }
         return null;

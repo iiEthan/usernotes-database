@@ -199,4 +199,18 @@ public class DatabaseHandler {
         }
         statement.close();
     }
+
+    public static void removePoints(String type, String id, CommandSender sender) throws SQLException {
+        statement = connection.createStatement();
+        String db = type + "s";
+
+        statement.executeUpdate(
+                "DELETE FROM " + db + " WHERE " + type + "id='" + id + "'"
+        );
+
+        sender.sendMessage(ChatColor.GREEN + "Removed " + type + " ID #" + id + " from database.");
+
+        statement.close();
+    }
+
 }

@@ -2,6 +2,7 @@ package com.rteenagers.parrot;
 
 import com.rteenagers.parrot.commands.PointCommand;
 import com.rteenagers.parrot.commands.PointsCommand;
+import com.rteenagers.parrot.commands.RemovePoint;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.SQLException;
@@ -15,6 +16,7 @@ public final class Usernotes extends JavaPlugin {
         // Register commands
         getCommand("point").setExecutor(new PointCommand());
         getCommand("points").setExecutor(new PointsCommand());
+        getCommand("removepoint").setExecutor(new RemovePoint());
 
         // Register Database
         try {

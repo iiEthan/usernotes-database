@@ -1,5 +1,5 @@
 name: Usernotes
-version: 0.1.0
+version: 0.1.1
 main: com.rteenagers.parrot.Usernotes
 api-version: "1.16"
 description: Fetches sheets for in-game use
@@ -9,5 +9,8 @@ commands:
     description: Usernotes lookup command
     usage: "/points [user]"
   point:
-    description: Usernotes manager
+    description: Adds usernote
     usage: "/point [ban/mute/warnban/warnmute] [user] [amount] [reason]"
+  removepoint:
+    description: Removes a usernote from the database
+    usage: "/point [ban/mute] [id]"
