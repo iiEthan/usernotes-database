@@ -1,6 +1,7 @@
 package com.rteenagers.parrot;
 
 import com.rteenagers.parrot.commands.PointCommand;
+import com.rteenagers.parrot.commands.PointLookup;
 import com.rteenagers.parrot.commands.PointsCommand;
 import com.rteenagers.parrot.commands.RemovePoint;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -17,6 +18,7 @@ public final class Usernotes extends JavaPlugin {
         getCommand("point").setExecutor(new PointCommand());
         getCommand("points").setExecutor(new PointsCommand());
         getCommand("removepoint").setExecutor(new RemovePoint());
+        getCommand("pointlookup").setExecutor(new PointLookup());
 
         // Register Database
         try {

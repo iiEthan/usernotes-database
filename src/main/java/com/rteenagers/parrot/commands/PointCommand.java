@@ -110,7 +110,7 @@ public class PointCommand implements TabExecutor {
                         return arguments;
 
                 default:
-                    return null;
+                    return new ArrayList<>();
             }
         }
         return null;

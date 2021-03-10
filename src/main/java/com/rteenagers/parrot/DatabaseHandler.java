@@ -59,70 +59,41 @@ public class DatabaseHandler {
     public static void getPoints(String uuid, String player, CommandSender sender) throws SQLException {
         statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 
-        // Display mutes
-        ResultSet rs = statement.executeQuery("SELECT * FROM mutes WHERE uuid='" + uuid + "'");
-        if (rs.next()) {
-            sender.sendMessage(ChatColor.RED + "\nMute Logs for " + ChatColor.DARK_AQUA + player + ChatColor.RED + ": ");
+        String[] types = {"ban", "mute"};
+        for (String type : types) { // So we don't have to copy and paste twice
 
-            rs.beforeFirst();
-            while (rs.next()) {
+            // Display mutes
+            ResultSet rs = statement.executeQuery("SELECT * FROM " + type + "S WHERE uuid='" + uuid + "'");
+            if (rs.next()) {
+                sender.sendMessage(ChatColor.RED + "\n" + type.substring(0,1).toUpperCase() + type.substring(1) + " Logs for " + ChatColor.DARK_AQUA + player + ChatColor.RED + ": ");
 
-                int muteid = rs.getInt("muteid");
-                int points = rs.getInt("points");
-                String reason = rs.getString("reason");
-                String mod = rs.getString("mod");
-                boolean warning = rs.getBoolean("warning");
-                boolean decayed = rs.getBoolean("decayed");
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("(MM/dd/yy)");
-                String date = simpleDateFormat.format(rs.getDate("date"));
+                rs.beforeFirst();
+                while (rs.next()) {
 
-                String decayFormat = (decayed) ? ChatColor.STRIKETHROUGH + "" + ChatColor.RED + " DECAYED" : "";
-                String warningFormat = (warning) ? ChatColor.BOLD + "" + ChatColor.YELLOW + " (Warning)" : "";
+                    int noteid = rs.getInt(type +"id");
+                    int points = rs.getInt("points");
+                    String reason = rs.getString("reason");
+                    String mod = rs.getString("mod");
+                    boolean warning = rs.getBoolean("warning");
+                    boolean decayed = rs.getBoolean("decayed");
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("(MM/dd/yy)");
+                    String date = simpleDateFormat.format(rs.getDate("date"));
 
-                        sender.sendMessage(decayFormat +
-                        ChatColor.GREEN + "MUTE ID #" + muteid + " " + date + ":\n" +
-                        ChatColor.BLUE + "Infraction: " + ChatColor.DARK_AQUA + reason +
-                        ChatColor.BLUE + "Points: " + ChatColor.DARK_AQUA + points + " " +
-                        ChatColor.BLUE + "Mod: " + ChatColor.DARK_AQUA + mod + warningFormat + decayFormat
-                );
+                    String decayFormat = (decayed) ? ChatColor.STRIKETHROUGH + "" + ChatColor.RED + " DECAYED" : "";
+                    String warningFormat = (warning) ? ChatColor.BOLD + "" + ChatColor.YELLOW + " (Warning)" : "";
 
+                    sender.sendMessage(decayFormat +
+                            ChatColor.GREEN + type.toUpperCase() + " ID #" + noteid + " " + date + ":\n" +
+                            ChatColor.BLUE + "Infraction: " + ChatColor.DARK_AQUA + reason +
+                            ChatColor.BLUE + "Points: " + ChatColor.DARK_AQUA + points + " " +
+                            ChatColor.BLUE + "Mod: " + ChatColor.DARK_AQUA + mod + warningFormat + decayFormat
+                    );
+
+                }
+            } else {
+                sender.sendMessage(ChatColor.RED + "No " + type + " points were found for " + ChatColor.RED + player);
             }
-        } else {
-            sender.sendMessage(ChatColor.RED + "No mute points were found for " + ChatColor.RED + player);
         }
-
-        // Display bans -- honestly I could make this function half as large but I'm just too lazy right now, so uh do it later pls future Ethan?
-        rs = statement.executeQuery("SELECT * FROM bans WHERE uuid='" + uuid + "'");
-        if (rs.next()) {
-            sender.sendMessage(ChatColor.RED + "\nBan Logs for " + ChatColor.DARK_AQUA + player + ChatColor.RED + ": ");
-
-            rs.beforeFirst();
-            while (rs.next()) {
-
-                int banid = rs.getInt("banid");
-                int points = rs.getInt("points");
-                String reason = rs.getString("reason");
-                String mod = rs.getString("mod");
-                boolean warning = rs.getBoolean("warning");
-                boolean decayed = rs.getBoolean("decayed");
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("(MM/dd/yy)");
-                String date = simpleDateFormat.format(rs.getDate("date"));
-
-                String decayFormat = (decayed) ? ChatColor.STRIKETHROUGH + "" + ChatColor.RED + " DECAYED" : "";
-                String warningFormat = (warning) ? ChatColor.BOLD + "" + ChatColor.YELLOW + " (Warning)" : "";
-
-                sender.sendMessage(
-                        ChatColor.GREEN + "BAN ID #" + banid + " " + date + ": \n" +
-                        ChatColor.BLUE + "Infraction: " + ChatColor.DARK_AQUA + reason +
-                        ChatColor.BLUE + "Points: " + ChatColor.DARK_AQUA + points + " " +
-                        ChatColor.BLUE + "Mod: " + ChatColor.DARK_AQUA + mod + warningFormat + decayFormat
-                );
-
-            }
-        } else {
-            sender.sendMessage(ChatColor.RED + "No ban points were found for " + ChatColor.RED + player);
-        }
-
         statement.close();
     }
 
@@ -213,4 +184,32 @@ public class DatabaseHandler {
         statement.close();
     }
 
+    public static void pointLookup(String type, String id, CommandSender sender) throws SQLException {
+        statement = connection.createStatement();
+        String db = type + "s";
+
+        ResultSet rs = statement.executeQuery("SELECT * FROM " + db + " WHERE " + type + "id='" + id + "'");
+        rs.next();
+
+        int noteid = rs.getInt(type+"id");
+        int points = rs.getInt("points");
+        String reason = rs.getString("reason");
+        String mod = rs.getString("mod");
+        boolean warning = rs.getBoolean("warning");
+        boolean decayed = rs.getBoolean("decayed");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("(MM/dd/yy)");
+        String date = simpleDateFormat.format(rs.getDate("date"));
+
+        String decayFormat = (decayed) ? ChatColor.STRIKETHROUGH + "" + ChatColor.RED + " DECAYED" : "";
+        String warningFormat = (warning) ? ChatColor.BOLD + "" + ChatColor.YELLOW + " (Warning)" : "";
+
+        sender.sendMessage(
+                ChatColor.GREEN + type.toUpperCase() + " ID #" + noteid + " " + date + ": \n" +
+                        ChatColor.BLUE + "Infraction: " + ChatColor.DARK_AQUA + reason +
+                        ChatColor.BLUE + "Points: " + ChatColor.DARK_AQUA + points + " " +
+                        ChatColor.BLUE + "Mod: " + ChatColor.DARK_AQUA + mod + warningFormat + decayFormat
+        );
+
+        statement.close();
+    }
 }
