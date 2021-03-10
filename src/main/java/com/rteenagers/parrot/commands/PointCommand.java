@@ -19,6 +19,10 @@ public class PointCommand implements TabExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (!sender.hasPermission("points.edit")) {
+            sender.sendMessage(ChatColor.RED + "You are not permitted to do this!");
+            return true;
+        }
 
         if (args.length < 4) { // User must give an input
             sender.sendMessage(ChatColor.RED + "Please provide more arguments! Usage is /point [ban/mute/warn] [player] [amount] [reason]");

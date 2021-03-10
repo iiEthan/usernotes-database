@@ -17,3 +17,15 @@ commands:
   pointlookup:
     description: View a specific note
     usage: "/pointlookup [ban/mute] [id]"
+
+permissions:
+  point.edit:
+    description: Allows users to add or remove points
+    default: op
+  points.lookup.self:
+    description: Allows users to search their own points (currently unused)
+    default: op
+  points.lookup.all:
+    description: Allows users to search up anyones points
+    default: op
+

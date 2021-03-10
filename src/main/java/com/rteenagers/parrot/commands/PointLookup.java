@@ -15,6 +15,10 @@ public class PointLookup implements TabExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (!sender.hasPermission("points.lookup.all")) {
+            sender.sendMessage(ChatColor.RED + "You are not permitted to do this!");
+            return true;
+        }
 
         if (args.length < 2) { // User must give an input
             sender.sendMessage(ChatColor.RED + "Please provide more arguments! Usage is /pointlookup [ban/mute/] [id]");
