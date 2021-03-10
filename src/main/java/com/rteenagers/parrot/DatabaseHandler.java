@@ -6,6 +6,7 @@ import org.bukkit.command.CommandSender;
 import org.postgresql.util.PSQLException;
 
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 
@@ -56,16 +57,72 @@ public class DatabaseHandler {
     }
 
     public static void getPoints(String uuid, String player, CommandSender sender) throws SQLException {
-        statement = connection.createStatement();
+        statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 
-        ResultSet rs = statement.executeQuery("SELECT * FROM bans WHERE uuid='" + uuid + "'");
+        // Display mutes
+        ResultSet rs = statement.executeQuery("SELECT * FROM mutes WHERE uuid='" + uuid + "'");
         if (rs.next()) {
+            sender.sendMessage(ChatColor.RED + "\nMute Logs for " + ChatColor.DARK_AQUA + player + ChatColor.RED + ": ");
+
+            rs.beforeFirst();
             while (rs.next()) {
-                sender.sendMessage(rs.getString("reason"));
+
+                int muteid = rs.getInt("muteid");
+                int points = rs.getInt("points");
+                String reason = rs.getString("reason");
+                String mod = rs.getString("mod");
+                boolean warning = rs.getBoolean("warning");
+                boolean decayed = rs.getBoolean("decayed");
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("(MM/dd/yy)");
+                String date = simpleDateFormat.format(rs.getDate("date"));
+
+                String decayFormat = (decayed) ? ChatColor.STRIKETHROUGH + "" + ChatColor.RED + " DECAYED" : "";
+                String warningFormat = (warning) ? ChatColor.BOLD + "" + ChatColor.YELLOW + " (Warning)" : "";
+
+                        sender.sendMessage(decayFormat +
+                        ChatColor.GREEN + "MUTE ID #" + muteid + " " + date + ":\n" +
+                        ChatColor.BLUE + "Infraction: " + ChatColor.DARK_AQUA + reason +
+                        ChatColor.BLUE + "Points: " + ChatColor.DARK_AQUA + points + " " +
+                        ChatColor.BLUE + "Mod: " + ChatColor.DARK_AQUA + mod + warningFormat + decayFormat
+                );
+
             }
         } else {
-            sender.sendMessage(ChatColor.RED + "No points were found for " + ChatColor.RED + player);
+            sender.sendMessage(ChatColor.RED + "No mute points were found for " + ChatColor.RED + player);
         }
+
+        // Display bans -- honestly I could make this function half as large but I'm just too lazy right now, so uh do it later pls future Ethan?
+        rs = statement.executeQuery("SELECT * FROM bans WHERE uuid='" + uuid + "'");
+        if (rs.next()) {
+            sender.sendMessage(ChatColor.RED + "\nBan Logs for " + ChatColor.DARK_AQUA + player + ChatColor.RED + ": ");
+
+            rs.beforeFirst();
+            while (rs.next()) {
+
+                int banid = rs.getInt("banid");
+                int points = rs.getInt("points");
+                String reason = rs.getString("reason");
+                String mod = rs.getString("mod");
+                boolean warning = rs.getBoolean("warning");
+                boolean decayed = rs.getBoolean("decayed");
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("(MM/dd/yy)");
+                String date = simpleDateFormat.format(rs.getDate("date"));
+
+                String decayFormat = (decayed) ? ChatColor.STRIKETHROUGH + "" + ChatColor.RED + " DECAYED" : "";
+                String warningFormat = (warning) ? ChatColor.BOLD + "" + ChatColor.YELLOW + " (Warning)" : "";
+
+                sender.sendMessage(
+                        ChatColor.GREEN + "BAN ID #" + banid + " " + date + ": \n" +
+                        ChatColor.BLUE + "Infraction: " + ChatColor.DARK_AQUA + reason +
+                        ChatColor.BLUE + "Points: " + ChatColor.DARK_AQUA + points + " " +
+                        ChatColor.BLUE + "Mod: " + ChatColor.DARK_AQUA + mod + warningFormat + decayFormat
+                );
+
+            }
+        } else {
+            sender.sendMessage(ChatColor.RED + "No ban points were found for " + ChatColor.RED + player);
+        }
+
         statement.close();
     }
 
@@ -95,9 +152,7 @@ public class DatabaseHandler {
         statement.executeUpdate("INSERT INTO " + punishmentType + " (uuid, points, reason, mod, date, decayed, warning) " +
                 "VALUES ('" + uuid + "', " + points + ", '" + reason + "', '" + mod + "', current_timestamp, false, " + warning + ")");
 
-        sender.sendMessage(ChatColor.GREEN + "Player " + ChatColor.RED + player + ChatColor.GREEN + " has been given " + ChatColor.RED + points + ChatColor.GREEN + " points.");
-
-        // TODO: Remove points command, complete addPoints command
+        sender.sendMessage(ChatColor.GREEN + "Player " + ChatColor.RED + player + ChatColor.GREEN + " has been given " + ChatColor.RED + points + ChatColor.GREEN + " point(s).");
 
         // Gives out the punishment
         if (!warning) {
@@ -145,24 +200,3 @@ public class DatabaseHandler {
         statement.close();
     }
 }
-        /*sender.sendMessage(ChatColor.RED + "Mute Logs for " + ChatColor.DARK_AQUA + player + ChatColor.RED + ":");
-
-                sender.sendMessage(ChatColor.GREEN + row.get(7).toString() + ": " +                                 // Date
-                        ChatColor.BLUE + "Infraction: " + ChatColor.DARK_AQUA + row.get(1).toString() + " " +       // Infraction
-                        ChatColor.BLUE + "Action: " + ChatColor.DARK_AQUA + row.get(6).toString() + " " +           // Action
-                        ChatColor.BLUE + "Mod: " + ChatColor.DARK_AQUA + row.get(5).toString() + " ");              // Moderator
-
-        sender.sendMessage(ChatColor.RED + "Ban Logs for " + ChatColor.DARK_AQUA + player + ChatColor.RED + ":");
-        // Gets ban logs from spreadsheet
-        for (List row : banValues) {
-            String userCheck = row.get(0).toString().toLowerCase();
-            if (userCheck.equals(player.toLowerCase())) {
-
-                sender.sendMessage(ChatColor.GREEN + row.get(7).toString() + ": " +                                 // Date
-                        ChatColor.BLUE + "Infraction: " + ChatColor.DARK_AQUA + row.get(1).toString() + " " +       // Infraction
-                        ChatColor.BLUE + "Action: " + ChatColor.DARK_AQUA + row.get(6).toString() + " " +           // Action
-                        ChatColor.BLUE + "Mod: " + ChatColor.DARK_AQUA + row.get(5).toString() + " ");              // Moderator
-
-        sender.sendMessage(ChatColor.BLUE + "Latest mute value: " + ChatColor.DARK_AQUA + latestMutePoints);
-        sender.sendMessage(ChatColor.BLUE + "Latest ban value: " + ChatColor.DARK_AQUA + latestBanPoints);
-    }*/

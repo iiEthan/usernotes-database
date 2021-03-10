@@ -19,8 +19,9 @@ public class PointsCommand implements TabExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (args.length == 0) {
-            sender.sendMessage(ChatColor.RED + "Please provide a player to lookup");
+        if (args.length == 0) { // User must provide an input
+            sender.sendMessage(ChatColor.RED + "Please provide a player to lookup.");
+            return true;
         }
 
         String target = args[0];
