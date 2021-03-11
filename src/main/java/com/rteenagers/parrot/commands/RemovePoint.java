@@ -10,6 +10,7 @@ import org.bukkit.command.TabExecutor;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class RemovePoint implements TabExecutor {
 
@@ -21,7 +22,12 @@ public class RemovePoint implements TabExecutor {
         }
 
         if (args.length < 2) { // User must give an input
-            sender.sendMessage(ChatColor.RED + "Please provide more arguments! Usage is /removepoint [ban/mute/] [id]");
+            sender.sendMessage(ChatColor.RED + "Please provide more arguments! Usage is /removepoint [ban/mute] [id]");
+            return true;
+        }
+
+        if (!(args[0].equalsIgnoreCase("ban") || args[0].equalsIgnoreCase("warn"))) { // Check if punishment input is valid
+            sender.sendMessage(ChatColor.RED + "Please provide a valid punishment to remove as the first argument. Usage is /removepoint [ban/mute] [id]");
             return true;
         }
 

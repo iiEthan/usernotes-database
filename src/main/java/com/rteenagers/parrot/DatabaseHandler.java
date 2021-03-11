@@ -15,7 +15,7 @@ public class DatabaseHandler {
     static Connection connection;
     static Statement statement;
     // ENTER DB INFO BELOW IN THE FORMAT: jdbc:language://host:port/db?user=username&password=password
-    public static String connectionURL = "jdbc:postgresql://usernotes.ctlynjuzcvj9.us-east-1.rds.amazonaws.com:5432/postgres?user=root&password=WVZWLFup4OHPzbKHLg0T";
+    public static String connectionURL = "jdbc:postgresql://18.222.80.191:5432/tg_usernotes?user=tg_server&password=i!Lov3!c0ck!";
 
     public static void openConnection() throws SQLException, ClassNotFoundException {
 
