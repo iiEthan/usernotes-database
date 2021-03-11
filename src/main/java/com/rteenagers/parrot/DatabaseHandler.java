@@ -18,7 +18,6 @@ public class DatabaseHandler {
     public static String connectionURL = "jdbc:postgresql://18.222.80.191:5432/tg_usernotes?user=tg_server&password=i!Lov3!c0ck!";
 
     public static void openConnection() throws SQLException, ClassNotFoundException {
-
         Class.forName("org.postgresql.Driver");
         connection = DriverManager.getConnection(DatabaseHandler.connectionURL);
         try {
@@ -107,11 +106,11 @@ public class DatabaseHandler {
             rs.last();
 
             // Converts and compares dates
-            LocalDate then = LocalDate.parse(rs.getDate("date").toLocalDate().toString());//, formatter);
+            LocalDate then = LocalDate.parse(rs.getDate("date").toLocalDate().toString());
             LocalDate now = LocalDate.now();
             long daysBetween = ChronoUnit.DAYS.between(then, now);
 
-            // If the previous punishment exceeds decay requirement, we will decay all of their points
+            // If the previous punishment exceeds decay requirement, we will decay all of their current points
             if (daysBetween > Utils.decayValues.get(punishmentType)) {
                 statement.executeUpdate("UPDATE " + punishmentType +
                         " SET decayed = true" +
@@ -175,7 +174,7 @@ public class DatabaseHandler {
         statement = connection.createStatement();
         String db = type + "s";
 
-        ResultSet rs = statement.executeQuery("SELECT " + type + "id FROM " + db + " WHERE banid =" + Integer.parseInt(id));
+        ResultSet rs = statement.executeQuery("SELECT " + type + "id FROM " + db + " WHERE " + type + "id =" + Integer.parseInt(id));
 
         if (!rs.isBeforeFirst()) {
             sender.sendMessage(ChatColor.RED + "ID #" + id + " not found.");
@@ -191,27 +190,31 @@ public class DatabaseHandler {
         String db = type + "s";
 
         ResultSet rs = statement.executeQuery("SELECT * FROM " + db + " WHERE " + type + "id='" + id + "'");
-        rs.next();
 
-        int noteid = rs.getInt(type+"id");
-        int points = rs.getInt("points");
-        String reason = rs.getString("reason");
-        String mod = rs.getString("mod");
-        boolean warning = rs.getBoolean("warning");
-        boolean decayed = rs.getBoolean("decayed");
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("(MM/dd/yy)");
-        String date = simpleDateFormat.format(rs.getDate("date"));
+        if (rs.next()) {
 
-        String decayFormat = (decayed) ? ChatColor.STRIKETHROUGH + "" + ChatColor.RED + " DECAYED" : "";
-        String warningFormat = (warning) ? ChatColor.BOLD + "" + ChatColor.YELLOW + " (Warning)" : "";
+            int noteid = rs.getInt(type + "id");
+            int points = rs.getInt("points");
+            String reason = rs.getString("reason");
+            String mod = rs.getString("mod");
+            boolean warning = rs.getBoolean("warning");
+            boolean decayed = rs.getBoolean("decayed");
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("(MM/dd/yy)");
+            String date = simpleDateFormat.format(rs.getDate("date"));
 
-        sender.sendMessage(
-                ChatColor.GREEN + type.toUpperCase() + " ID #" + noteid + " " + date + ": \n" +
-                        ChatColor.BLUE + "Infraction: " + ChatColor.DARK_AQUA + reason +
-                        ChatColor.BLUE + "Points: " + ChatColor.DARK_AQUA + points + " " +
-                        ChatColor.BLUE + "Mod: " + ChatColor.DARK_AQUA + mod + warningFormat + decayFormat
-        );
+            String decayFormat = (decayed) ? ChatColor.STRIKETHROUGH + "" + ChatColor.RED + " DECAYED" : "";
+            String warningFormat = (warning) ? ChatColor.BOLD + "" + ChatColor.YELLOW + " (Warning)" : "";
 
-        statement.close();
+            sender.sendMessage(
+                    ChatColor.GREEN + type.toUpperCase() + " ID #" + noteid + " " + date + ": \n" +
+                            ChatColor.BLUE + "Infraction: " + ChatColor.DARK_AQUA + reason +
+                            ChatColor.BLUE + "Points: " + ChatColor.DARK_AQUA + points + " " +
+                            ChatColor.BLUE + "Mod: " + ChatColor.DARK_AQUA + mod + warningFormat + decayFormat
+            );
+            statement.close();
+        } else {
+            sender.sendMessage(ChatColor.RED + "ID #" + id + " not found.");
+        }
     }
+
 }

@@ -25,6 +25,11 @@ public class PointLookup implements TabExecutor {
             return true;
         }
 
+        if (!(args[0].equalsIgnoreCase("ban") || args[0].equalsIgnoreCase("mute"))) { // Check if punishment input is valid
+            sender.sendMessage(ChatColor.RED + "Please provide a valid punishment to remove as the first argument. Usage is /removepoint [ban/mute] [id]");
+            return true;
+        }
+
         if (!Utils.isInteger(args[1])) { // Check if point is valid
             sender.sendMessage(ChatColor.RED + "Please provide a valid number as the ID argument.");
             return true;
