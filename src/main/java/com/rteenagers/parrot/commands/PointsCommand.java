@@ -19,13 +19,22 @@ public class PointsCommand implements TabExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!sender.hasPermission("points.all")) {
-            sender.sendMessage(ChatColor.RED + "You are not permitted to do this!");
+        if ((args.length == 0) && (sender.hasPermission("points.lookup.self"))) { // If no input is provided, the sender will be checked
+
+            @SuppressWarnings("deprecation")
+            OfflinePlayer op = Bukkit.getOfflinePlayer(sender.getName());
+            UUID uuid = op.getUniqueId();
+
+            try {
+                DatabaseHandler.getPoints(String.valueOf(uuid), op.getName(), sender);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
             return true;
         }
 
-        if (args.length == 0) { // User must provide an input
-            sender.sendMessage(ChatColor.RED + "Please provide a player to lookup.");
+        if (!sender.hasPermission("points.all")) {
+            sender.sendMessage(ChatColor.RED + "You are not permitted to do this!");
             return true;
         }
 
