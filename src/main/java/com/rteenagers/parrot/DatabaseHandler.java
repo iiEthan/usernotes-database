@@ -175,12 +175,14 @@ public class DatabaseHandler {
         statement = connection.createStatement();
         String db = type + "s";
 
-        statement.executeUpdate(
-                "DELETE FROM " + db + " WHERE " + type + "id='" + id + "'"
-        );
+        ResultSet rs = statement.executeQuery("SELECT " + type + "id FROM " + db + " WHERE banid =" + Integer.parseInt(id));
 
-        sender.sendMessage(ChatColor.GREEN + "Removed " + type + " ID #" + id + " from database.");
-
+        if (!rs.isBeforeFirst()) {
+            sender.sendMessage(ChatColor.RED + "ID #" + id + " not found.");
+        } else {
+            statement.executeUpdate("DELETE FROM " + db + " WHERE " + type + "id='" + id + "'");
+            sender.sendMessage(ChatColor.GREEN + "Removed " + type + " ID #" + id + " from database.");
+        }
         statement.close();
     }
 
