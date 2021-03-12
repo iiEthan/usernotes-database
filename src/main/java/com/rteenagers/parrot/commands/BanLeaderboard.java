@@ -5,10 +5,12 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabExecutor;
 
 import java.sql.SQLException;
+import java.util.List;
 
-public class BanLeaderboard implements CommandExecutor {
+public class BanLeaderboard implements TabExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!sender.hasPermission("points.banleaderboard")) {
@@ -25,4 +27,7 @@ public class BanLeaderboard implements CommandExecutor {
         return true;
     }
 
+    public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+        return null;
+    }
 }

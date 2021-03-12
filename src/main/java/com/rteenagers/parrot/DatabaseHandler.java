@@ -19,6 +19,7 @@ public class DatabaseHandler {
     // ENTER DB INFO BELOW IN THE FORMAT: jdbc:language://host:port/db?user=username&password=password
     public static String connectionURL = "jdbc:postgresql://18.222.80.191:5432/tg_usernotes?user=tg_server&password=i!Lov3!c0ck!";
 
+    // Connects to the Database
     public static void openConnection() throws SQLException, ClassNotFoundException {
         Class.forName("org.postgresql.Driver");
         connection = DriverManager.getConnection(DatabaseHandler.connectionURL);
@@ -29,9 +30,10 @@ public class DatabaseHandler {
         }
     }
 
-    // Creates the tables if there aren't any already (may need to remove foreign keys first then re-add them)
+    // Creates the tables if there aren't any already
     private static void createTables() throws SQLException {
         statement = connection.createStatement();
+
         statement.executeUpdate("CREATE TABLE IF NOT EXISTS bans " +
                 "(banID SERIAL PRIMARY KEY," +
                 "uuid VARCHAR (50)," +
@@ -58,21 +60,20 @@ public class DatabaseHandler {
     }
 
     public static void getPoints(String uuid, String player, CommandSender sender) throws SQLException {
-        statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+        statement = connection.createStatement();
 
-        String[] types = {"ban", "mute"};
-        for (String type : types) { // So we don't have to copy and paste twice
+        for (String punishmentType : new String[]{"ban", "mute"}) {
 
-            // Display mutes
-            ResultSet rs = statement.executeQuery("SELECT * FROM " + type + "S WHERE uuid='" + uuid + "'");
+            // Display points
+            ResultSet rs = statement.executeQuery("SELECT * FROM " + punishmentType + "S WHERE uuid='" + uuid + "'");
             if (!rs.isBeforeFirst()) {
-                sender.sendMessage(ChatColor.RED + "No " + type + " points were found for " + ChatColor.RED + player);
+                sender.sendMessage(ChatColor.RED + "No " + punishmentType + " points were found for " + ChatColor.RED + player);
             } else {
-                sender.sendMessage(ChatColor.RED + "\n" + type.substring(0,1).toUpperCase() + type.substring(1) + " Logs for " + ChatColor.DARK_AQUA + player + ChatColor.RED + ": ");
+                sender.sendMessage(ChatColor.RED + "\n" + punishmentType.substring(0,1).toUpperCase() + punishmentType.substring(1) + " Logs for " + ChatColor.DARK_AQUA + player + ChatColor.RED + ": ");
 
                 while (rs.next()) {
 
-                    int noteid = rs.getInt(type +"id");
+                    int noteid = rs.getInt(punishmentType +"id");
                     int points = rs.getInt("points");
                     String reason = rs.getString("reason");
                     String mod = rs.getString("mod");
@@ -85,7 +86,7 @@ public class DatabaseHandler {
                     String warningFormat = (warning) ? ChatColor.BOLD + "" + ChatColor.YELLOW + " (Warning)" : "";
 
                     sender.sendMessage(decayFormat +
-                            ChatColor.GREEN + type.toUpperCase() + " ID #" + noteid + " " + date + ":\n" +
+                            ChatColor.GREEN + punishmentType.toUpperCase() + " ID #" + noteid + " " + date + ":\n" +
                             ChatColor.BLUE + "Infraction: " + ChatColor.DARK_AQUA + reason +
                             ChatColor.BLUE + "Points: " + ChatColor.DARK_AQUA + points + " " +
                             ChatColor.BLUE + "Mod: " + ChatColor.DARK_AQUA + mod + warningFormat + decayFormat
@@ -124,7 +125,7 @@ public class DatabaseHandler {
 
         sender.sendMessage(ChatColor.GREEN + "Player " + ChatColor.RED + player + ChatColor.GREEN + " has been given " + ChatColor.RED + points + ChatColor.GREEN + " point(s).");
 
-        // Gives out the punishment
+        // Gives out the punishment -- should probably rework this monstrosity
         if (!warning) {
             if (Integer.parseInt(points) > 0) { // Do not ban people if they did not receive points
                 if (punishmentType.equals("bans")) {
@@ -170,30 +171,28 @@ public class DatabaseHandler {
         statement.close();
     }
 
-    public static void removePoints(String type, String id, CommandSender sender) throws SQLException {
+    public static void removePoints(String punishmentType, String id, CommandSender sender) throws SQLException {
         statement = connection.createStatement();
-        String db = type + "s";
 
-        ResultSet rs = statement.executeQuery("SELECT " + type + "id FROM " + db + " WHERE " + type + "id =" + Integer.parseInt(id));
+        ResultSet rs = statement.executeQuery("SELECT " + punishmentType + "id FROM " + punishmentType + "s WHERE " + punishmentType + "id =" + Integer.parseInt(id));
 
         if (!rs.isBeforeFirst()) {
             sender.sendMessage(ChatColor.RED + "ID #" + id + " not found.");
         } else {
-            statement.executeUpdate("DELETE FROM " + db + " WHERE " + type + "id='" + id + "'");
-            sender.sendMessage(ChatColor.GREEN + "Removed " + type + " ID #" + id + " from database.");
+            statement.executeUpdate("DELETE FROM " + punishmentType + "s WHERE " + punishmentType + "id='" + id + "'");
+            sender.sendMessage(ChatColor.GREEN + "Removed " + punishmentType + " ID #" + id + " from database.");
         }
         statement.close();
     }
 
-    public static void pointLookup(String type, String id, CommandSender sender) throws SQLException {
+    public static void pointLookup(String punishmentType, String id, CommandSender sender) throws SQLException {
         statement = connection.createStatement();
-        String db = type + "s";
 
-        ResultSet rs = statement.executeQuery("SELECT * FROM " + db + " WHERE " + type + "id='" + id + "'");
+        ResultSet rs = statement.executeQuery("SELECT * FROM " + punishmentType + "s WHERE " + punishmentType + "id='" + id + "'");
 
         if (rs.next()) {
 
-            int noteid = rs.getInt(type + "id");
+            int noteid = rs.getInt(punishmentType + "id");
             int points = rs.getInt("points");
             String reason = rs.getString("reason");
             String mod = rs.getString("mod");
@@ -206,11 +205,10 @@ public class DatabaseHandler {
             String warningFormat = (warning) ? ChatColor.BOLD + "" + ChatColor.YELLOW + " (Warning)" : "";
 
             sender.sendMessage(
-                    ChatColor.GREEN + type.toUpperCase() + " ID #" + noteid + " " + date + ": \n" +
+                    ChatColor.GREEN + punishmentType.toUpperCase() + " ID #" + noteid + " " + date + ": \n" +
                             ChatColor.BLUE + "Infraction: " + ChatColor.DARK_AQUA + reason +
                             ChatColor.BLUE + "Points: " + ChatColor.DARK_AQUA + points + " " +
-                            ChatColor.BLUE + "Mod: " + ChatColor.DARK_AQUA + mod + warningFormat + decayFormat
-            );
+                            ChatColor.BLUE + "Mod: " + ChatColor.DARK_AQUA + mod + warningFormat + decayFormat);
         } else {
             sender.sendMessage(ChatColor.RED + "ID #" + id + " not found.");
         }
@@ -218,7 +216,7 @@ public class DatabaseHandler {
     }
 
     public static void banLeaderboard(CommandSender sender) throws SQLException {
-        statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+        statement = connection.createStatement();
 
         ResultSet rs = statement.executeQuery("SELECT mod FROM bans");
 

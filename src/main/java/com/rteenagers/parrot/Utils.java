@@ -1,7 +1,7 @@
 package com.rteenagers.parrot;
 
 // This class just makes a dictionary for the ban values. It is its own class for the sake of cleanliness
-// Note: the last point on both hashes are missing because they are not temporary meaning it's not needed since it's a special case
+// Note: the last point on both hashes are missing because they are special cases
 
 import java.util.Dictionary;
 import java.util.Hashtable;
