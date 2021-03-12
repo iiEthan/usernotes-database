@@ -17,6 +17,9 @@ commands:
   pointlookup:
     description: View a specific note
     usage: "/pointlookup [ban/mute] [id]"
+  banleaderboard:
+    description: View who has the most bans
+    usage: /banleaderboard
 
 permissions:
   point.edit:
@@ -27,5 +30,8 @@ permissions:
     default: op
   points.lookup.all:
     description: Allows users to search up anyones points
+    default: op
+  points.banleaderboard:
+    description: Allows users to see who has the most bans
     default: op
 

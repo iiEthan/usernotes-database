@@ -9,6 +9,8 @@ import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DatabaseHandler {
 
@@ -211,10 +213,37 @@ public class DatabaseHandler {
                             ChatColor.BLUE + "Points: " + ChatColor.DARK_AQUA + points + " " +
                             ChatColor.BLUE + "Mod: " + ChatColor.DARK_AQUA + mod + warningFormat + decayFormat
             );
-            statement.close();
         } else {
             sender.sendMessage(ChatColor.RED + "ID #" + id + " not found.");
         }
+        statement.close();
+    }
+
+    public static void banLeaderboard(CommandSender sender) throws SQLException {
+        statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+
+        ResultSet rs = statement.executeQuery("SELECT mod FROM bans");
+
+        if (rs.next()) {
+            rs.beforeFirst();
+
+            HashMap<String, Integer> freqMap = new HashMap<>();
+            while (rs.next()) {
+                String mod = rs.getString("mod");
+                int freq = freqMap.getOrDefault(mod, 0); // this may be the smartest line of code i have ever made. that is all.
+                freqMap.put(mod, ++freq);
+            }
+            sender.sendMessage(ChatColor.DARK_RED + "" + ChatColor.BOLD + "Ban Leaderboard");
+            for (Map.Entry<String, Integer> result : freqMap.entrySet()) {
+                sender.sendMessage(
+                        ChatColor.RESET + "" + ChatColor.DARK_AQUA + result.getKey() + ": " + ChatColor.WHITE +  result.getValue()
+                );
+            }
+        } else {
+            sender.sendMessage(ChatColor.RED + "No ban logs found.");
+        }
+
+        statement.close();
     }
 
 }
