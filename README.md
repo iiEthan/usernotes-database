@@ -11,4 +11,6 @@ Usage:
 
 /removepoint [ban/mute] [id]
 
+/banleaderboard
+
 Hosted alongside with Pigeon on AWS.

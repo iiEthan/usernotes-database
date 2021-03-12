@@ -65,10 +65,11 @@ public class DatabaseHandler {
 
             // Display mutes
             ResultSet rs = statement.executeQuery("SELECT * FROM " + type + "S WHERE uuid='" + uuid + "'");
-            if (rs.next()) {
+            if (!rs.isBeforeFirst()) {
+                sender.sendMessage(ChatColor.RED + "No " + type + " points were found for " + ChatColor.RED + player);
+            } else {
                 sender.sendMessage(ChatColor.RED + "\n" + type.substring(0,1).toUpperCase() + type.substring(1) + " Logs for " + ChatColor.DARK_AQUA + player + ChatColor.RED + ": ");
 
-                rs.beforeFirst();
                 while (rs.next()) {
 
                     int noteid = rs.getInt(type +"id");
@@ -89,10 +90,7 @@ public class DatabaseHandler {
                             ChatColor.BLUE + "Points: " + ChatColor.DARK_AQUA + points + " " +
                             ChatColor.BLUE + "Mod: " + ChatColor.DARK_AQUA + mod + warningFormat + decayFormat
                     );
-
                 }
-            } else {
-                sender.sendMessage(ChatColor.RED + "No " + type + " points were found for " + ChatColor.RED + player);
             }
         }
         statement.close();
@@ -224,9 +222,9 @@ public class DatabaseHandler {
 
         ResultSet rs = statement.executeQuery("SELECT mod FROM bans");
 
-        if (rs.next()) {
-            rs.beforeFirst();
-
+        if (!rs.isBeforeFirst()) {
+            sender.sendMessage(ChatColor.RED + "No ban logs found.");
+        } else {
             HashMap<String, Integer> freqMap = new HashMap<>();
             while (rs.next()) {
                 String mod = rs.getString("mod");
@@ -235,14 +233,9 @@ public class DatabaseHandler {
             }
             sender.sendMessage(ChatColor.DARK_RED + "" + ChatColor.BOLD + "Ban Leaderboard");
             for (Map.Entry<String, Integer> result : freqMap.entrySet()) {
-                sender.sendMessage(
-                        ChatColor.RESET + "" + ChatColor.DARK_AQUA + result.getKey() + ": " + ChatColor.WHITE +  result.getValue()
-                );
+                sender.sendMessage(ChatColor.RESET + "" + ChatColor.DARK_AQUA + result.getKey() + ": " + ChatColor.WHITE + result.getValue());
             }
-        } else {
-            sender.sendMessage(ChatColor.RED + "No ban logs found.");
         }
-
         statement.close();
     }
 
