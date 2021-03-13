@@ -18,8 +18,6 @@ public class PointCommand implements TabExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        DatabaseHandler.checkConnection(sender);
-
         if (!sender.hasPermission("points.edit")) {
             sender.sendMessage(ChatColor.RED + "You are not permitted to do this!");
             return true;

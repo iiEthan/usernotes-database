@@ -10,10 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BanLeaderboard implements TabExecutor {
-
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        DatabaseHandler.checkConnection(sender);
 
         if (!sender.hasPermission("points.banleaderboard")) {
             sender.sendMessage(ChatColor.RED + "You are not permitted to do this!");

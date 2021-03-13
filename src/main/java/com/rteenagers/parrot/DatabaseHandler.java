@@ -1,5 +1,6 @@
 package com.rteenagers.parrot;
 
+import org.apache.commons.dbcp.BasicDataSource;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -13,18 +14,36 @@ import java.util.Map;
 
 public class DatabaseHandler {
 
+    private static BasicDataSource dataSource;
     static Connection connection;
     static Statement statement;
-    // ENTER DB INFO BELOW IN THE FORMAT: jdbc:language://host:port/db?user=username&password=password
-    public static String connectionURL = "jdbc:postgresql://18.222.80.191:5432/tg_usernotes?user=tg_server&password=i!Lov3!c0ck!";
+
+    private static BasicDataSource getDataSource() {
+        if (dataSource == null)
+        {
+            BasicDataSource ds = new BasicDataSource();
+            ds.setUrl("jdbc:postgresql://18.222.80.191:5432/tg_usernotes");
+            ds.setUsername("tg_server");
+            ds.setPassword("i!Lov3!c0ck!");
+
+            ds.setMinIdle(5);
+            ds.setMaxIdle(10);
+            ds.setMaxOpenPreparedStatements(100);
+
+            dataSource = ds;
+        }
+        return dataSource;
+    }
 
     // Connects to the Database
     public static void openConnection() {
+        BasicDataSource dataSource = DatabaseHandler.getDataSource();
+
         try {
             Class.forName("org.postgresql.Driver");
-        connection = DriverManager.getConnection(DatabaseHandler.connectionURL);
+            connection = dataSource.getConnection();
             createTables();
-        } catch (ClassNotFoundException | SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
@@ -262,17 +281,4 @@ public class DatabaseHandler {
             sender.sendMessage("An error has occurred!");
         }
     }
-
-    // Connection to database appears to close after some time, this should hopefully fix it!
-    public static void checkConnection(CommandSender sender) {
-        try {
-            if (!connection.isValid(5)) {
-                DatabaseHandler.openConnection();
-            }
-        } catch (SQLException e) {
-            sender.sendMessage(ChatColor.RED + "Connection to database failed. Please check console for more details.");
-            e.printStackTrace();
-        }
-    }
-
 }
