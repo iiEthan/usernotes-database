@@ -9,7 +9,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -62,11 +61,8 @@ public class PointCommand implements TabExecutor {
                 sender.sendMessage(ChatColor.RED + "Invalid syntax. Please enter " + ChatColor.DARK_RED + "[ban/mute/warnban/warnmute] " + ChatColor.RED + "as the first argument.");
                 return true;
             }
-        try {
+
             DatabaseHandler.addPoints(args[1], punishmentType, String.valueOf(player), sender.getName(), reason.toString(), args[2], args[0].startsWith("warn"), sender);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
 
         return true;
     }
@@ -110,7 +106,7 @@ public class PointCommand implements TabExecutor {
                     return arguments;
 
                     case 4:
-                        if (args[3].equals("")) {
+                        if (args[3].isEmpty()) {
                             arguments.add("reason");
                         }
                         return arguments;

@@ -7,7 +7,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,8 +14,6 @@ public class PointLookup implements TabExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        DatabaseHandler.checkConnection(sender);
-
         if (!sender.hasPermission("points.lookup.all")) {
             sender.sendMessage(ChatColor.RED + "You are not permitted to do this!");
             return true;
@@ -37,11 +34,7 @@ public class PointLookup implements TabExecutor {
             return true;
         }
 
-        try {
-            DatabaseHandler.pointLookup(args[0], args[1], sender);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        DatabaseHandler.pointLookup(args[0], args[1], sender);
 
         return true;
     }

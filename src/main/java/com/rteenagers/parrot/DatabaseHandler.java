@@ -3,7 +3,6 @@ package com.rteenagers.parrot;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
-import org.postgresql.util.PSQLException;
 
 import java.sql.*;
 import java.text.SimpleDateFormat;
@@ -20,12 +19,12 @@ public class DatabaseHandler {
     public static String connectionURL = "jdbc:postgresql://18.222.80.191:5432/tg_usernotes?user=tg_server&password=i!Lov3!c0ck!";
 
     // Connects to the Database
-    public static void openConnection() throws SQLException, ClassNotFoundException {
-        Class.forName("org.postgresql.Driver");
-        connection = DriverManager.getConnection(DatabaseHandler.connectionURL);
+    public static void openConnection() {
         try {
+            Class.forName("org.postgresql.Driver");
+        connection = DriverManager.getConnection(DatabaseHandler.connectionURL);
             createTables();
-        } catch (PSQLException e) {
+        } catch (ClassNotFoundException | SQLException e) {
             e.printStackTrace();
         }
     }
@@ -59,8 +58,9 @@ public class DatabaseHandler {
         System.out.println("Created new tables");
     }
 
-    public static void getPoints(String uuid, String player, CommandSender sender) throws SQLException {
-        statement = connection.createStatement();
+    public static void getPoints(String uuid, String player, CommandSender sender) {
+        try {
+            statement = connection.createStatement();
 
         for (String punishmentType : new String[]{"ban", "mute"}) {
 
@@ -95,10 +95,16 @@ public class DatabaseHandler {
             }
         }
         statement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            sender.sendMessage("An error has occurred!");
+        }
     }
 
-    public static void addPoints(String player, String punishmentType, String uuid, String mod, String reason, String points, Boolean warning, CommandSender sender) throws SQLException {
-        statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+    public static void addPoints(String player, String punishmentType, String uuid, String mod, String reason, String points, Boolean warning, CommandSender sender) {
+        try {
+            statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+
 
         // First, we need to check if the users points have decayed. This will be easier for when we parse the dataset later.
         ResultSet rs = statement.executeQuery("SELECT date FROM " + punishmentType + " WHERE uuid='" + uuid + "' AND decayed = false");
@@ -169,10 +175,16 @@ public class DatabaseHandler {
             }
         }
         statement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            sender.sendMessage("An error has occurred!");
+        }
     }
 
-    public static void removePoints(String punishmentType, String id, CommandSender sender) throws SQLException {
-        statement = connection.createStatement();
+    public static void removePoints(String punishmentType, String id, CommandSender sender) {
+        try {
+            statement = connection.createStatement();
+
 
         ResultSet rs = statement.executeQuery("SELECT " + punishmentType + "id FROM " + punishmentType + "s WHERE " + punishmentType + "id =" + Integer.parseInt(id));
 
@@ -183,40 +195,50 @@ public class DatabaseHandler {
             sender.sendMessage(ChatColor.GREEN + "Removed " + punishmentType + " ID #" + id + " from database.");
         }
         statement.close();
-    }
-
-    public static void pointLookup(String punishmentType, String id, CommandSender sender) throws SQLException {
-        statement = connection.createStatement();
-
-        ResultSet rs = statement.executeQuery("SELECT * FROM " + punishmentType + "s WHERE " + punishmentType + "id='" + id + "'");
-
-        if (rs.next()) {
-
-            int noteid = rs.getInt(punishmentType + "id");
-            int points = rs.getInt("points");
-            String reason = rs.getString("reason");
-            String mod = rs.getString("mod");
-            boolean warning = rs.getBoolean("warning");
-            boolean decayed = rs.getBoolean("decayed");
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("(MM/dd/yy)");
-            String date = simpleDateFormat.format(rs.getDate("date"));
-
-            String decayFormat = (decayed) ? ChatColor.STRIKETHROUGH + "" + ChatColor.RED + " DECAYED" : "";
-            String warningFormat = (warning) ? ChatColor.BOLD + "" + ChatColor.YELLOW + " (Warning)" : "";
-
-            sender.sendMessage(
-                    ChatColor.GREEN + punishmentType.toUpperCase() + " ID #" + noteid + " " + date + ": \n" +
-                            ChatColor.BLUE + "Infraction: " + ChatColor.DARK_AQUA + reason +
-                            ChatColor.BLUE + "Points: " + ChatColor.DARK_AQUA + points + " " +
-                            ChatColor.BLUE + "Mod: " + ChatColor.DARK_AQUA + mod + warningFormat + decayFormat);
-        } else {
-            sender.sendMessage(ChatColor.RED + "ID #" + id + " not found.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+            sender.sendMessage("An error has occurred!");
         }
-        statement.close();
     }
 
-    public static void banLeaderboard(CommandSender sender) throws SQLException {
-        statement = connection.createStatement();
+    public static void pointLookup(String punishmentType, String id, CommandSender sender) {
+        try {
+            statement = connection.createStatement();
+
+            ResultSet rs = statement.executeQuery("SELECT * FROM " + punishmentType + "s WHERE " + punishmentType + "id='" + id + "'");
+
+            if (rs.next()) {
+
+                int noteid = rs.getInt(punishmentType + "id");
+                int points = rs.getInt("points");
+                String reason = rs.getString("reason");
+                String mod = rs.getString("mod");
+                 boolean warning = rs.getBoolean("warning");
+                boolean decayed = rs.getBoolean("decayed");
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("(MM/dd/yy)");
+                String date = simpleDateFormat.format(rs.getDate("date"));
+
+                String decayFormat = (decayed) ? ChatColor.STRIKETHROUGH + "" + ChatColor.RED + " DECAYED" : "";
+                String warningFormat = (warning) ? ChatColor.BOLD + "" + ChatColor.YELLOW + " (Warning)" : "";
+
+                sender.sendMessage(
+                                ChatColor.GREEN + punishmentType.toUpperCase() + " ID #" + noteid + " " + date + ": \n" +
+                                ChatColor.BLUE + "Infraction: " + ChatColor.DARK_AQUA + reason +
+                                ChatColor.BLUE + "Points: " + ChatColor.DARK_AQUA + points + " " +
+                                ChatColor.BLUE + "Mod: " + ChatColor.DARK_AQUA + mod + warningFormat + decayFormat);
+            } else {
+                sender.sendMessage(ChatColor.RED + "ID #" + id + " not found.");
+            }
+            statement.close();
+        } catch (SQLException e) {
+                e.printStackTrace();
+                sender.sendMessage("An error has occurred!");
+        }
+    }
+
+    public static void banLeaderboard(CommandSender sender) {
+        try {
+            statement = connection.createStatement();
 
         ResultSet rs = statement.executeQuery("SELECT mod FROM bans");
 
@@ -226,7 +248,7 @@ public class DatabaseHandler {
             HashMap<String, Integer> freqMap = new HashMap<>();
             while (rs.next()) {
                 String mod = rs.getString("mod");
-                int freq = freqMap.getOrDefault(mod, 0); // this may be the smartest line of code i have ever made. that is all.
+                int freq = freqMap.getOrDefault(mod, 0);
                 freqMap.put(mod, ++freq);
             }
             sender.sendMessage(ChatColor.DARK_RED + "" + ChatColor.BOLD + "Ban Leaderboard");
@@ -235,16 +257,19 @@ public class DatabaseHandler {
             }
         }
         statement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            sender.sendMessage("An error has occurred!");
+        }
     }
 
     // Connection to database appears to close after some time, this should hopefully fix it!
     public static void checkConnection(CommandSender sender) {
         try {
             if (!connection.isValid(5)) {
-                sender.sendMessage(ChatColor.RED + "Connection has been closed. Attempting to reconnect to the database...");
                 DatabaseHandler.openConnection();
             }
-        } catch (SQLException | ClassNotFoundException e) {
+        } catch (SQLException e) {
             sender.sendMessage(ChatColor.RED + "Connection to database failed. Please check console for more details.");
             e.printStackTrace();
         }

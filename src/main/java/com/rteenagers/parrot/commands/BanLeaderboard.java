@@ -6,7 +6,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
-import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class BanLeaderboard implements TabExecutor {
@@ -20,16 +20,13 @@ public class BanLeaderboard implements TabExecutor {
             return true;
         }
 
-        try {
-            DatabaseHandler.banLeaderboard(sender);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        DatabaseHandler.banLeaderboard(sender);
 
         return true;
     }
 
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
-        return null;
+        // No subcommands, we do not want any tab completion
+        return new ArrayList<>();
     }
 }

@@ -9,7 +9,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,11 +26,7 @@ public class PointsCommand implements TabExecutor {
             OfflinePlayer op = Bukkit.getOfflinePlayer(sender.getName());
             UUID uuid = op.getUniqueId();
 
-            try {
-                DatabaseHandler.getPoints(String.valueOf(uuid), op.getName(), sender);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            DatabaseHandler.getPoints(String.valueOf(uuid), op.getName(), sender);
             return true;
         }
 
@@ -45,12 +40,8 @@ public class PointsCommand implements TabExecutor {
         @SuppressWarnings("deprecation")
         OfflinePlayer op = Bukkit.getOfflinePlayer(target); // Deprecated but should work without worry of it being removed, please replace if there's a better way :^)
             UUID uuid = op.getUniqueId();
-            try {
-                DatabaseHandler.getPoints(String.valueOf(uuid), target, sender);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-         return true;
+        DatabaseHandler.getPoints(String.valueOf(uuid), target, sender);
+        return true;
         }
 
     @Override
@@ -58,7 +49,7 @@ public class PointsCommand implements TabExecutor {
         if (command.getName().equalsIgnoreCase("points")) {
             if (args.length == 1) {
                 ArrayList<String> arguments = new ArrayList<>();
-                if (!args[0].equals("")) {
+                if (!args[0].isEmpty()) {
                     for (Player p : Bukkit.getOnlinePlayers()) {
                         if (p.getName().toLowerCase().startsWith(args[0].toLowerCase())) {
                             arguments.add(p.getName());

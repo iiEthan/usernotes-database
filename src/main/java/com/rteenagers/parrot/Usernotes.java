@@ -19,12 +19,8 @@ public final class Usernotes extends JavaPlugin {
         getCommand("banleaderboard").setExecutor(new BanLeaderboard());
 
         // Register Database
-        try {
-            DatabaseHandler.openConnection();
-            getLogger().info("Connection to usernotes database successfully made");
-        } catch (ClassNotFoundException | SQLException e) {
-            e.printStackTrace();
-        }
+        DatabaseHandler.openConnection();
+        getLogger().info("Connection to usernotes database successfully made");
 
         Utils.createHashes();
 

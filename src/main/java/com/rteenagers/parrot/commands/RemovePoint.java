@@ -7,7 +7,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,11 +36,7 @@ public class RemovePoint implements TabExecutor {
             return true;
         }
 
-        try {
-            DatabaseHandler.removePoints(args[0], args[1], sender);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        DatabaseHandler.removePoints(args[0], args[1], sender);
 
         return true;
     }
@@ -61,7 +56,7 @@ public class RemovePoint implements TabExecutor {
                     }
                     return arguments;
                 case 2:
-                    if (args[1].equals("")) {
+                    if (args[1].isEmpty()) {
                         arguments.add("noteid");
                     }
                     return arguments;
