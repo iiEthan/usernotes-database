@@ -237,4 +237,17 @@ public class DatabaseHandler {
         statement.close();
     }
 
+    // Connection to database appears to close after some time, this should hopefully fix it!
+    public static void checkConnection(CommandSender sender) {
+        try {
+            if (!connection.isValid(5)) {
+                sender.sendMessage(ChatColor.RED + "Connection has been closed. Attempting to reconnect to the database...");
+                DatabaseHandler.openConnection();
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            sender.sendMessage(ChatColor.RED + "Connection to database failed. Please check console for more details.");
+            e.printStackTrace();
+        }
+    }
+
 }

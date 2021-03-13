@@ -19,6 +19,8 @@ public class PointsCommand implements TabExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        DatabaseHandler.checkConnection(sender);
+
         if ((args.length == 0) && (sender.hasPermission("points.lookup.self"))) { // If no input is provided, the sender will be checked
 
             @SuppressWarnings("deprecation")

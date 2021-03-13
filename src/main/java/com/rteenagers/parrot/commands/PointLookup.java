@@ -15,6 +15,8 @@ public class PointLookup implements TabExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        DatabaseHandler.checkConnection(sender);
+
         if (!sender.hasPermission("points.lookup.all")) {
             sender.sendMessage(ChatColor.RED + "You are not permitted to do this!");
             return true;
