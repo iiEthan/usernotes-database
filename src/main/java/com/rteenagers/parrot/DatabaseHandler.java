@@ -24,8 +24,7 @@ public class DatabaseHandler {
 
     // Connects to the Database
     private static BasicDataSource getDataSource() {
-        if (dataSource == null)
-        {
+        if (dataSource == null) {
             BasicDataSource ds = new BasicDataSource();
             ds.setUrl("jdbc:postgresql://18.222.80.191:5432/tg_usernotes");
             ds.setUsername("tg_server");
@@ -34,7 +33,10 @@ public class DatabaseHandler {
             ds.setMinIdle(5);
             ds.setMaxIdle(10);
             ds.setMaxOpenPreparedStatements(100);
-
+            ds.setTestOnBorrow(true);
+            ds.setTestWhileIdle(true);
+            ds.setTestOnReturn(true);
+            ds.setValidationQuery("SELECT 1");
             dataSource = ds;
         }
         return dataSource;
