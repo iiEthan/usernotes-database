@@ -284,7 +284,7 @@ public class DatabaseHandler {
         statement = connection.createStatement();
 
         try {
-            ResultSet rs = statement.executeQuery("SELECT mod FROM bans");
+            rs = statement.executeQuery("SELECT mod FROM bans");
 
             if (!rs.isBeforeFirst()) {
                 sender.sendMessage(ChatColor.RED + "No ban logs found.");

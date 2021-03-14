@@ -13,7 +13,7 @@ import java.util.List;
 public class BanLeaderboard implements TabExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!sender.hasPermission("points.lookup.self")) {
+        if (!sender.hasPermission("points.lookup.all")) {
             sender.sendMessage(ChatColor.RED + "You are not permitted to do this!");
             return true;
         }
