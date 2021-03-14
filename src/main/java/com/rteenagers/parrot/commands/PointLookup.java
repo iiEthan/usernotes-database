@@ -7,6 +7,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +35,11 @@ public class PointLookup implements TabExecutor {
             return true;
         }
 
-        DatabaseHandler.pointLookup(args[0], args[1], sender);
+        try {
+            DatabaseHandler.pointLookup(args[0], args[1], sender);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         return true;
     }

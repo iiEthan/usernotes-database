@@ -7,13 +7,13 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class RemovePoint implements TabExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-
         if (!sender.hasPermission("points.edit")) {
             sender.sendMessage(ChatColor.RED + "You are not permitted to do this!");
             return true;
@@ -34,7 +34,11 @@ public class RemovePoint implements TabExecutor {
             return true;
         }
 
-        DatabaseHandler.removePoints(args[0], args[1], sender);
+        try {
+            DatabaseHandler.removePoints(args[0], args[1], sender);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         return true;
     }

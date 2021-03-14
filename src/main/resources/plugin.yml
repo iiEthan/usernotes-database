@@ -1,5 +1,5 @@
 name: Usernotes
-version: 0.1.4
+version: 0.1.5
 main: com.rteenagers.parrot.Usernotes
 api-version: "1.16"
 description: Fetches sheets for in-game use
@@ -14,15 +14,17 @@ commands:
   removepoint:
     description: Removes a usernote from the database
     usage: "/removepoint [ban/mute] [id]"
+    aliases: [pointremove]
   pointlookup:
     description: View a specific note
     usage: "/pointlookup [ban/mute] [id]"
+    aliases: [lookuppoint]
   banleaderboard:
     description: View who has the most bans
     usage: /banleaderboard
 
 permissions:
-  point.edit:
+  points.edit:
     description: Allows users to add or remove points
     default: op
   points.lookup.self:
@@ -30,8 +32,5 @@ permissions:
     default: op
   points.lookup.all:
     description: Allows users to search up anyones points
-    default: op
-  points.banleaderboard:
-    description: Allows users to see who has the most bans
     default: op
 

@@ -9,6 +9,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,12 +20,15 @@ public class PointsCommand implements TabExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if ((args.length == 0) && (sender.hasPermission("points.lookup.self"))) { // If no input is provided, the sender will be checked
-
             @SuppressWarnings("deprecation")
             OfflinePlayer op = Bukkit.getOfflinePlayer(sender.getName());
             UUID uuid = op.getUniqueId();
 
-            DatabaseHandler.getPoints(String.valueOf(uuid), op.getName(), sender);
+            try {
+                DatabaseHandler.getPoints(String.valueOf(uuid), op.getName(), sender);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
             return true;
         }
 
@@ -38,7 +42,11 @@ public class PointsCommand implements TabExecutor {
         @SuppressWarnings("deprecation")
         OfflinePlayer op = Bukkit.getOfflinePlayer(target); // Deprecated but should work without worry of it being removed, please replace if there's a better way :^)
             UUID uuid = op.getUniqueId();
-        DatabaseHandler.getPoints(String.valueOf(uuid), target, sender);
+        try {
+            DatabaseHandler.getPoints(String.valueOf(uuid), target, sender);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return true;
         }
 

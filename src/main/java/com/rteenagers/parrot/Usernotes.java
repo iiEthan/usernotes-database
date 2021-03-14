@@ -3,6 +3,8 @@ package com.rteenagers.parrot;
 import com.rteenagers.parrot.commands.*;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.sql.SQLException;
+
 @SuppressWarnings("ALL")
 public final class Usernotes extends JavaPlugin {
 
@@ -17,7 +19,11 @@ public final class Usernotes extends JavaPlugin {
         getCommand("banleaderboard").setExecutor(new BanLeaderboard());
 
         // Register Database
-        DatabaseHandler.openConnection();
+        try {
+            DatabaseHandler.createTables();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         getLogger().info("Connection to usernotes database successfully made");
 
         Utils.createHashes();
@@ -27,12 +33,11 @@ public final class Usernotes extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        // Close DB connection so on reload we dont have multiple idled connections
-       // try {
-            //DatabaseHandler.connection.close();
-        //} catch (SQLException throwables) {
-        //    throwables.printStackTrace();
-        //}
+        try {
+            DatabaseHandler.dataSource.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         getLogger().info("Usernotes has been disabled!");
     }
 }

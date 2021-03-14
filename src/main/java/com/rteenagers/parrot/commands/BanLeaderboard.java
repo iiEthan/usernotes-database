@@ -6,19 +6,23 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class BanLeaderboard implements TabExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-
-        if (!sender.hasPermission("points.banleaderboard")) {
+        if (!sender.hasPermission("points.lookup.self")) {
             sender.sendMessage(ChatColor.RED + "You are not permitted to do this!");
             return true;
         }
 
-        DatabaseHandler.banLeaderboard(sender);
+        try {
+            DatabaseHandler.banLeaderboard(sender);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         return true;
     }
