@@ -19,13 +19,11 @@ public class CommandManager implements TabExecutor {
         plugin.getCommand("point").setExecutor(this);
         plugin.getCommand("points").setExecutor(this);
         plugin.getCommand("removepoint").setExecutor(this);
-        plugin.getCommand("banleaderboard").setExecutor(this);
 
         this.commands.add(new PointLookupCommand());
         this.commands.add(new PointCommand());
         this.commands.add(new PointsCommand());
         this.commands.add(new RemovePointCommand());
-        this.commands.add(new BanLeaderboardCommand());
     }
 
     @Override

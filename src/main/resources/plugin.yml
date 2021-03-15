@@ -19,9 +19,6 @@ commands:
     description: View a specific note
     usage: "/pointlookup [ban/mute] [id]"
     aliases: [lookuppoint]
-  banleaderboard:
-    description: View who has the most bans
-    usage: /banleaderboard
 
 permissions:
   points.edit:
@@ -33,7 +30,4 @@ permissions:
   points.lookup.self:
     description: Allows users to search up their own points
     default: true
-  points.leaderboard:
-    description: Allows users to see the points leaderboard
-    default: op
 
