@@ -55,6 +55,7 @@ public class RemovePointCommand extends UsernotesCommand {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String alias, String[] args) {
         ArrayList<String> arguments = new ArrayList<>();
+
         switch (args.length) {
             case 1:
                 String[] punishments = {"ban", "mute"};

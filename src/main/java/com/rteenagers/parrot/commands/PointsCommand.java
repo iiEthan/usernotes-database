@@ -51,6 +51,7 @@ public class PointsCommand extends UsernotesCommand {
             return;
         }
 
+        // Users require special perms to check other peoples points
         if (!sender.hasPermission("points.lookup.all")) {
             sender.sendMessage(ChatColor.RED + "You do not have permission to do this!");
             return;
@@ -59,7 +60,7 @@ public class PointsCommand extends UsernotesCommand {
         String target = args[0];
 
         @SuppressWarnings("deprecation")
-        OfflinePlayer op = Bukkit.getOfflinePlayer(target); // Deprecated but should work without worry of it being removed, please replace if there's a better way :^)
+        OfflinePlayer op = Bukkit.getOfflinePlayer(target); // Deprecated but should work without worry of it being removed, please replace if there's a better way to get someones UUID :^)
         UUID uuid = op.getUniqueId();
         try {
             DatabaseHandler.getPoints(String.valueOf(uuid), target, sender);
@@ -72,6 +73,8 @@ public class PointsCommand extends UsernotesCommand {
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String alias, String[] args) {
         if (args.length == 1) {
             ArrayList<String> arguments = new ArrayList<>();
+
+            // First argument will get a list of players
             if (!args[0].isEmpty()) {
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     if (p.getName().toLowerCase().startsWith(args[0].toLowerCase())) {

@@ -11,6 +11,7 @@ public class Utils {
     public static Dictionary<Integer, String> muteValues = new Hashtable<>();
     public static Dictionary<String, Integer> decayValues = new Hashtable<>();
 
+    // Helps us apply the correct punishment from point amount
     public static void createHashes() {
         banValues.put(1, "1d");
         banValues.put(2, "2d");

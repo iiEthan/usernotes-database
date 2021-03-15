@@ -14,9 +14,6 @@ public class CommandManager implements TabExecutor {
     private final Usernotes plugin = Usernotes.getInstance();
     private final ArrayList<UsernotesCommand> commands = new ArrayList<>();
 
-    public CommandManager() {
-    }
-
     public void setup() {
         plugin.getCommand("pointlookup").setExecutor(this);
         plugin.getCommand("point").setExecutor(this);
@@ -53,6 +50,7 @@ public class CommandManager implements TabExecutor {
         return true;
     }
 
+    // Gets command from input. We cannot use command.getName() and whatnot because we are using a custom UsernotesCommand class
     private UsernotesCommand getCommand(String name) {
         for (UsernotesCommand uc : this.commands) {
             if (uc.name().equalsIgnoreCase(name)) {
@@ -62,6 +60,7 @@ public class CommandManager implements TabExecutor {
         return null;
     }
 
+    // how the fuck is this even working i'm just shocked
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         UsernotesCommand usernotesCommand = getCommand(command.getName());

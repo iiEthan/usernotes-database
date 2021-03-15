@@ -5,6 +5,7 @@ import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
+// We are using a custom command class mainly for neatness, readability, and consistency
 public abstract class UsernotesCommand {
 
     public UsernotesCommand() {

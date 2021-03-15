@@ -22,7 +22,7 @@ public class DatabaseHandler {
     private static Statement statement;
     private static ResultSet rs;
 
-    // Connects to the Database
+    // Gets database pooling connection
     private static BasicDataSource getDataSource() {
         if (dataSource == null) {
             BasicDataSource ds = new BasicDataSource();
@@ -30,6 +30,7 @@ public class DatabaseHandler {
             ds.setUsername("tg_server");
             ds.setPassword("i!Lov3!c0ck!");
 
+            // Prevents database from timing out. Not sure if all of these are necessary but I cba to test
             ds.setMinIdle(5);
             ds.setMaxIdle(10);
             ds.setMaxOpenPreparedStatements(100);
@@ -42,7 +43,7 @@ public class DatabaseHandler {
         return dataSource;
     }
 
-    // Connects to the Database
+    // Connects to the database
     public static void openConnection() {
         BasicDataSource dataSource = DatabaseHandler.getDataSource();
         try {
@@ -96,7 +97,7 @@ public class DatabaseHandler {
 
             // Display points
             rs = statement.executeQuery("SELECT * FROM " + punishmentType + "S WHERE uuid='" + uuid + "'");
-            if (!rs.isBeforeFirst()) {
+            if (!rs.isBeforeFirst()) { // Testing to see if any results were retrieved
                 sender.sendMessage(ChatColor.RED + "No " + punishmentType + " points were found for " + ChatColor.RED + player);
             } else {
                 sender.sendMessage(ChatColor.RED + "\n" + punishmentType.substring(0,1).toUpperCase() + punishmentType.substring(1) + " Logs for " + ChatColor.DARK_AQUA + player + ChatColor.RED + ": ");
@@ -169,14 +170,17 @@ public class DatabaseHandler {
             // Gives out the punishment -- should probably rework this monstrosity
             if (!warning) {
                 if (Integer.parseInt(points) > 0) { // Do not ban people if they did not receive points
+
+                    // Gets the users total current points
+                    int total = 0;
+                    while (rs.next()) {
+                        total += rs.getInt("points");
+                    }
+
                     if (punishmentType.equals("bans")) {
                         rs = statement.executeQuery("SELECT points FROM bans WHERE uuid='" + uuid + "' AND decayed = false");
 
-                        int total = 0;
-                        while (rs.next()) {
-                            total += rs.getInt("points");
-                        }
-
+                        // Applies the proper ban punishment to the user
                         String command;
                         if (total > 9) { // Permanent bans are special cases
                             command = "ban " + player + " " + reason;
@@ -188,12 +192,7 @@ public class DatabaseHandler {
                     } else if (punishmentType.equals("mutes")) {
                         rs = statement.executeQuery("SELECT points FROM mutes WHERE uuid='" + uuid + "' AND decayed = false");
 
-                        int total = 0;
-                        while (rs.next()) {
-                            total += rs.getInt("points");
-                        }
-
-                        // Punish the user with the appropriate mute point
+                        // Applies the proper mute punishment to the user
                         if (total < 5) { // Tempmute
                             String command = "tempmute " + player + " " + Utils.muteValues.get(total) + " " + reason;
                             Bukkit.dispatchCommand(sender, command);
@@ -226,9 +225,9 @@ public class DatabaseHandler {
         try {
             rs = statement.executeQuery("SELECT " + punishmentType + "id FROM " + punishmentType + "s WHERE " + punishmentType + "id =" + Integer.parseInt(id));
 
-            if (!rs.isBeforeFirst()) {
+            if (!rs.isBeforeFirst()) { // Check if ID exists
                 sender.sendMessage(ChatColor.RED + "ID #" + id + " not found.");
-            } else {
+            } else { // Removes the column from ban ID
                 statement.executeUpdate("DELETE FROM " + punishmentType + "s WHERE " + punishmentType + "id='" + id + "'");
                 sender.sendMessage(ChatColor.GREEN + "Removed " + punishmentType + " ID #" + id + " from database.");
             }
@@ -249,8 +248,8 @@ public class DatabaseHandler {
         try {
             rs = statement.executeQuery("SELECT * FROM " + punishmentType + "s WHERE " + punishmentType + "id='" + id + "'");
 
-            if (rs.next()) {
-
+            if (rs.next()) { // Check if point exists and goes to it
+                // Retrieves point information
                 int noteid = rs.getInt(punishmentType + "id");
                 int points = rs.getInt("points");
                 String reason = rs.getString("reason");
@@ -260,6 +259,7 @@ public class DatabaseHandler {
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("(MM/dd/yy)");
                 String date = simpleDateFormat.format(rs.getDate("date"));
 
+                //  If the point has decayed or is a warning, it will be added to the end of the line
                 String decayFormat = (decayed) ? ChatColor.STRIKETHROUGH + "" + ChatColor.RED + " DECAYED" : "";
                 String warningFormat = (warning) ? ChatColor.BOLD + "" + ChatColor.YELLOW + " (Warning)" : "";
 
@@ -288,11 +288,11 @@ public class DatabaseHandler {
         try {
             rs = statement.executeQuery("SELECT mod FROM bans");
 
-            if (!rs.isBeforeFirst()) {
+            if (!rs.isBeforeFirst()) { // Check if there are any bans
                 sender.sendMessage(ChatColor.RED + "No ban logs found.");
             } else {
                 HashMap<String, Integer> freqMap = new HashMap<>();
-                while (rs.next()) {
+                while (rs.next()) { // Traverses through the ban logs and counts how many times a mod appears
                     String mod = rs.getString("mod");
                     int freq = freqMap.getOrDefault(mod, 0);
                     freqMap.put(mod, ++freq);
