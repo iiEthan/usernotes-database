@@ -1,22 +1,22 @@
 package com.rteenagers.parrot;
 
-import com.rteenagers.parrot.commands.*;
+import com.rteenagers.parrot.commands.manager.CommandManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.SQLException;
 
 @SuppressWarnings("ALL")
 public final class Usernotes extends JavaPlugin {
+    private static Usernotes instance;
+    public CommandManager commandManager;
 
     @Override
     public void onEnable() {
 
         // Register commands
-        getCommand("point").setExecutor(new PointCommand());
-        getCommand("points").setExecutor(new PointsCommand());
-        getCommand("removepoint").setExecutor(new RemovePoint());
-        getCommand("pointlookup").setExecutor(new PointLookup());
-        getCommand("banleaderboard").setExecutor(new BanLeaderboard());
+        setInstance(this);
+        commandManager = new CommandManager();
+        commandManager.setup();
 
         // Register Database
         try {
@@ -39,5 +39,13 @@ public final class Usernotes extends JavaPlugin {
             e.printStackTrace();
         }
         getLogger().info("Usernotes has been disabled!");
+    }
+
+    public static Usernotes getInstance() {
+        return instance;
+    }
+
+    public static void setInstance(Usernotes instance) {
+        Usernotes.instance = instance;
     }
 }

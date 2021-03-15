@@ -27,10 +27,10 @@ permissions:
   points.edit:
     description: Allows users to add or remove points
     default: op
-  points.lookup.self:
-    description: Allows users to search their own points
-    default: op
-  points.lookup.all:
+  points.lookup:
     description: Allows users to search up anyones points
+    default: op
+  points.leaderboard:
+    description: Allows users to see the points leaderboard
     default: op
 
