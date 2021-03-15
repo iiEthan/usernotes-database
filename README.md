@@ -10,7 +10,3 @@ Usage:
 /pointlookup [ban/mute] [id]
 
 /removepoint [ban/mute] [id]
-
-/banleaderboard
-
-Hosted alongside with Pigeon on AWS.
