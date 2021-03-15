@@ -50,6 +50,7 @@ public class PointCommand extends UsernotesCommand {
             reason.append(args[i]).append(" ");
         }
 
+        // ethan, please don't forget to fix this fucking mess of a code
         @SuppressWarnings("deprecation")
         UUID player = Bukkit.getOfflinePlayer(args[1]).getUniqueId();
         String punishmentType;

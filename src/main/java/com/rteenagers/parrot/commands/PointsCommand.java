@@ -3,6 +3,7 @@ package com.rteenagers.parrot.commands;
 import com.rteenagers.parrot.DatabaseHandler;
 import com.rteenagers.parrot.commands.manager.UsernotesCommand;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -27,7 +28,7 @@ public class PointsCommand extends UsernotesCommand {
 
     @Override
     public String permission() {
-        return "points.lookup";
+        return "points.lookup.self";
     }
 
     @Override
@@ -47,6 +48,11 @@ public class PointsCommand extends UsernotesCommand {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+            return;
+        }
+
+        if (!sender.hasPermission("points.lookup.all")) {
+            sender.sendMessage(ChatColor.RED + "You do not have permission to do this!");
             return;
         }
 

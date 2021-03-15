@@ -36,11 +36,13 @@ public class CommandManager implements TabExecutor {
         UsernotesCommand usernotesCommand = getCommand(command.getName());
         assert usernotesCommand != null;
 
+        // Check if user has permission to send command
         if (!sender.hasPermission(usernotesCommand.permission())) {
             sender.sendMessage(ChatColor.RED + "You are not permitted to do this!");
             return true;
         }
 
+        // Makes sure that there is enough subcommands supplied
         if (args.length < usernotesCommand.argsCount()) {
             sender.sendMessage(ChatColor.RED + "Please provide more arguments! Usage is " + usernotesCommand.info());
             return true;

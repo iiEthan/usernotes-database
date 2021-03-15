@@ -1,5 +1,5 @@
 name: Usernotes
-version: 0.1.5
+version: 1.0.0
 main: com.rteenagers.parrot.Usernotes
 api-version: "1.16"
 description: Fetches sheets for in-game use
@@ -27,9 +27,12 @@ permissions:
   points.edit:
     description: Allows users to add or remove points
     default: op
-  points.lookup:
+  points.lookup.all:
     description: Allows users to search up anyones points
     default: op
+  points.lookup.self:
+    description: Allows users to search up their own points
+    default: true
   points.leaderboard:
     description: Allows users to see the points leaderboard
     default: op

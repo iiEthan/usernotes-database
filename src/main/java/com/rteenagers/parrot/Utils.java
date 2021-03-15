@@ -30,6 +30,7 @@ public class Utils {
         muteValues.put(6, "3d");
         muteValues.put(7, "5d");
 
+        // Int is the amount of days required to decay
         decayValues.put("bans", 60);
         decayValues.put("mutes", 30);
     }

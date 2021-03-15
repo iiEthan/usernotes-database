@@ -5,7 +5,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.sql.SQLException;
 
-@SuppressWarnings("ALL")
 public final class Usernotes extends JavaPlugin {
     private static Usernotes instance;
     public CommandManager commandManager;
