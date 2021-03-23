@@ -11,16 +11,22 @@ public abstract class UsernotesCommand {
     public UsernotesCommand() {
     }
 
-    public abstract String name();
+    // Used for getCommand lookup
+    public abstract String getName();
 
-    public abstract String info();
+    // Gives back command usage
+    public abstract String getInfo();
 
-    public abstract String permission();
+    // Ensures user has the proper hasPermission to run command
+    public abstract String hasPermission();
 
-    public abstract int argsCount();
+    // Makes sure user provides enough subcommands
+    public abstract int getArgsCount();
 
+    // Same as onCommand method
     public abstract void execute(CommandSender sender, String[] args);
 
+    // Subcommand tab completion
     public abstract List<String> onTabComplete(CommandSender sender, Command command, String label, String alias, String[] args);
 
 }

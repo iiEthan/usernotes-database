@@ -9,26 +9,28 @@ import org.bukkit.command.CommandSender;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class PointLookupCommand extends UsernotesCommand {
 
     @Override
-    public String name() {
+    public String getName() {
         return "pointlookup";
     }
 
     @Override
-    public String info() {
+    public String getInfo() {
         return "/pointlookup [ban/mute] [id]";
     }
 
     @Override
-    public String permission() {
+    public String hasPermission() {
         return "points.lookup";
     }
 
-    public int argsCount() {
+    public int getArgsCount() {
         return 2;
     }
 
@@ -53,21 +55,11 @@ public class PointLookupCommand extends UsernotesCommand {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String alias, String[] args) {
-        ArrayList<String> arguments = new ArrayList<>();
         switch (args.length) {
             case 1:
-                String[] punishments = {"ban", "mute"};
-                for (String p : punishments) {
-                    if (p.startsWith(args[0].toLowerCase())) {
-                        arguments.add(p);
-                    }
-                }
-                return arguments;
+                return Arrays.asList("ban", "mute");
             case 2:
-                if (args[1].equals("")) {
-                    arguments.add("noteid");
-                }
-                return arguments;
+                return Collections.singletonList("noteid");
             default:
                 return new ArrayList<>();
         }

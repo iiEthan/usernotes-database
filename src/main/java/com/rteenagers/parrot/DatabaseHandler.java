@@ -12,8 +12,6 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.Map;
 
 public class DatabaseHandler {
 
@@ -227,7 +225,7 @@ public class DatabaseHandler {
 
             if (!rs.isBeforeFirst()) { // Check if ID exists
                 sender.sendMessage(ChatColor.RED + "ID #" + id + " not found.");
-            } else { // Removes the column from ban ID
+            } else { // Removes the column from ID
                 statement.executeUpdate("DELETE FROM " + punishmentType + "s WHERE " + punishmentType + "id='" + id + "'");
                 sender.sendMessage(ChatColor.GREEN + "Removed " + punishmentType + " ID #" + id + " from database.");
             }
@@ -274,37 +272,6 @@ public class DatabaseHandler {
         } catch (SQLException e) {
                 e.printStackTrace();
                 sender.sendMessage("An error has occurred!");
-        } finally {
-            rs.close();
-            statement.close();
-            connection.close();
-        }
-    }
-
-    public static void banLeaderboard(CommandSender sender) throws SQLException {
-        DatabaseHandler.openConnection();
-        statement = connection.createStatement();
-
-        try {
-            rs = statement.executeQuery("SELECT mod FROM bans");
-
-            if (!rs.isBeforeFirst()) { // Check if there are any bans
-                sender.sendMessage(ChatColor.RED + "No ban logs found.");
-            } else {
-                HashMap<String, Integer> freqMap = new HashMap<>();
-                while (rs.next()) { // Traverses through the ban logs and counts how many times a mod appears
-                    String mod = rs.getString("mod");
-                    int freq = freqMap.getOrDefault(mod, 0);
-                    freqMap.put(mod, ++freq);
-                }
-                sender.sendMessage(ChatColor.DARK_RED + "" + ChatColor.BOLD + "Ban Leaderboard");
-                for (Map.Entry<String, Integer> result : freqMap.entrySet()) {
-                    sender.sendMessage(ChatColor.RESET + "" + ChatColor.DARK_AQUA + result.getKey() + ": " + ChatColor.WHITE + result.getValue());
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            sender.sendMessage("An error has occurred!");
         } finally {
             rs.close();
             statement.close();

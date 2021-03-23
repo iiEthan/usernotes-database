@@ -9,34 +9,36 @@ import org.bukkit.command.CommandSender;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class RemovePointCommand extends UsernotesCommand {
 
     @Override
-    public String name() {
+    public String getName() {
         return "removepoint";
     }
 
     @Override
-    public String info() {
+    public String getInfo() {
         return "/removepoint [ban/mute] [id]";
     }
 
     @Override
-    public String permission() {
+    public String hasPermission() {
         return "points.edit";
     }
 
     @Override
-    public int argsCount() {
+    public int getArgsCount() {
         return 2;
     }
 
     @Override
     public void execute(CommandSender sender, String[] args) {
         if (!(args[0].equalsIgnoreCase("ban") || args[0].equalsIgnoreCase("mute"))) { // Check if punishment input is valid
-            sender.sendMessage(ChatColor.RED + "Please provide a valid punishment to remove as the first argument. Usage is " + info());
+            sender.sendMessage(ChatColor.RED + "Please provide a valid punishment to remove as the first argument. Usage is " + getInfo());
             return;
         }
 
@@ -54,22 +56,11 @@ public class RemovePointCommand extends UsernotesCommand {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String alias, String[] args) {
-        ArrayList<String> arguments = new ArrayList<>();
-
         switch (args.length) {
             case 1:
-                String[] punishments = {"ban", "mute"};
-                for (String p : punishments) {
-                    if (p.startsWith(args[0].toLowerCase())) {
-                        arguments.add(p);
-                    }
-                }
-                return arguments;
+                return Arrays.asList("ban", "mute");
             case 2:
-                if (args[1].isEmpty()) {
-                    arguments.add("noteid");
-                }
-                return arguments;
+                return Collections.singletonList("noteid");
             default:
                 return new ArrayList<>();
         }

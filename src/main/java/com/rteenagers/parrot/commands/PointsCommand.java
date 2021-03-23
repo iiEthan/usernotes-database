@@ -17,22 +17,22 @@ import java.util.UUID;
 
 public class PointsCommand extends UsernotesCommand {
     @Override
-    public String name() {
+    public String getName() {
         return "points";
     }
 
     @Override
-    public String info() {
+    public String getInfo() {
         return "points [user]";
     }
 
     @Override
-    public String permission() {
+    public String hasPermission() {
         return "points.lookup.self";
     }
 
     @Override
-    public int argsCount() {
+    public int getArgsCount() {
         return 0;
     }
 
@@ -53,7 +53,7 @@ public class PointsCommand extends UsernotesCommand {
 
         // Users require special perms to check other peoples points
         if (!sender.hasPermission("points.lookup.all")) {
-            sender.sendMessage(ChatColor.RED + "You do not have permission to do this!");
+            sender.sendMessage(ChatColor.RED + "You do not have hasPermission to do this!");
             return;
         }
 
@@ -74,25 +74,13 @@ public class PointsCommand extends UsernotesCommand {
         if (args.length == 1) {
             ArrayList<String> arguments = new ArrayList<>();
 
-            // First argument will get a list of players
-            if (!args[0].isEmpty()) {
-                for (Player p : Bukkit.getOnlinePlayers()) {
-                    if (p.getName().toLowerCase().startsWith(args[0].toLowerCase())) {
-                        arguments.add(p.getName());
-                    }
-                }
-            } else {
-                for (Player p : Bukkit.getOnlinePlayers()) {
-                    arguments.add(p.getName());
-                }
+            for (Player p : Bukkit.getOnlinePlayers()) {
+                arguments.add(p.getName());
             }
             Collections.sort(arguments);
-
             return arguments;
-        }
-        if (args.length > 1) {
+        } else {
             return new ArrayList<>();
         }
-        return null;
     }
 }
