@@ -17,8 +17,8 @@ public abstract class UsernotesCommand {
     // Gives back command usage
     public abstract String getInfo();
 
-    // Ensures user has the proper hasPermission to run command
-    public abstract String hasPermission();
+    // Ensures user has the proper permission to run command
+    public abstract String permission();
 
     // Makes sure user provides enough subcommands
     public abstract int getArgsCount();

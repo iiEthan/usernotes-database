@@ -34,8 +34,8 @@ public class CommandManager implements TabExecutor {
         UsernotesCommand usernotesCommand = getCommand(command.getName());
         assert usernotesCommand != null;
 
-        // Check if user has hasPermission to send command
-        if (!sender.hasPermission(usernotesCommand.hasPermission())) {
+        // Check if user has permission to send command
+        if (!sender.hasPermission(usernotesCommand.permission())) {
             sender.sendMessage(ChatColor.RED + "You are not permitted to do this!");
             return true;
         }
@@ -47,7 +47,6 @@ public class CommandManager implements TabExecutor {
         }
 
         usernotesCommand.execute(sender, args);
-
         return true;
     }
 

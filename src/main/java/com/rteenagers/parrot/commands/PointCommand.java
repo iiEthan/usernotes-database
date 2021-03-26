@@ -25,7 +25,7 @@ public class PointCommand extends UsernotesCommand {
     }
 
     @Override
-    public String hasPermission() {
+    public String permission() {
         return "points.edit";
     }
 

@@ -26,7 +26,7 @@ public class PointLookupCommand extends UsernotesCommand {
     }
 
     @Override
-    public String hasPermission() {
+    public String permission() {
         return "points.lookup";
     }
 

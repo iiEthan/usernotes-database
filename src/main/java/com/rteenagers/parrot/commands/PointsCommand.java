@@ -27,7 +27,7 @@ public class PointsCommand extends UsernotesCommand {
     }
 
     @Override
-    public String hasPermission() {
+    public String permission() {
         return "points.lookup.self";
     }
 
@@ -53,7 +53,7 @@ public class PointsCommand extends UsernotesCommand {
 
         // Users require special perms to check other peoples points
         if (!sender.hasPermission("points.lookup.all")) {
-            sender.sendMessage(ChatColor.RED + "You do not have hasPermission to do this!");
+            sender.sendMessage(ChatColor.RED + "You do not have permission to do this!");
             return;
         }
 
