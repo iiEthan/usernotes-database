@@ -91,7 +91,7 @@ public class DatabaseHandler {
         statement = connection.createStatement();
 
     try {
-        for (String punishmentType : new String[]{"ban", "mute"}) {
+        for (String punishmentType : new String[]{"mute", "ban"}) {
 
             // Display points
             rs = statement.executeQuery("SELECT * FROM " + punishmentType + "S WHERE uuid='" + uuid + "'");
@@ -135,15 +135,28 @@ public class DatabaseHandler {
     connection.close();
     }
 
-    public static void addPoints(String player, String punishmentType, String uuid, String mod, String reason, String points, Boolean warning, CommandSender sender) throws SQLException {
+    public static void addPoints(String[] args, CommandSender sender) throws SQLException {
         DatabaseHandler.openConnection();
         statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 
+        // Parses reason into its own string
+        StringBuilder reason = new StringBuilder();
+        for (int i = 3; i < args.length; i++) {
+            reason.append(args[i]).append(" ");
+        }
+
+        @SuppressWarnings("deprecation")
+        String uuid = String.valueOf(Bukkit.getOfflinePlayer(args[1]).getUniqueId());
+        String punishmentDB = args[0].contains("ban") ? "bans" : "mutes";
+        String player = args[1];
+        String points = args[2];
+        String mod = sender.getName();
+
         try {
             // First, we need to check if the users points have decayed. This will be easier for when we parse the dataset later.
-            rs = statement.executeQuery("SELECT date FROM " + punishmentType + " WHERE uuid='" + uuid + "' AND decayed = false");
+            rs = statement.executeQuery("SELECT date FROM " + punishmentDB + " WHERE uuid='" + uuid + "' AND decayed = false");
 
-            if (rs.next()) { // Skip if there are no logs
+            if (rs.next()) { // Make sure there are logs
                 rs.last();
 
                 // Converts and compares dates
@@ -152,57 +165,67 @@ public class DatabaseHandler {
                 long daysBetween = ChronoUnit.DAYS.between(then, now);
 
                 // If the previous punishment exceeds decay requirement, we will decay all of their current points
-                if (daysBetween > Utils.decayValues.get(punishmentType)) {
-                    statement.executeUpdate("UPDATE " + punishmentType +
+                if (daysBetween > Utils.decayValues.get(punishmentDB)) {
+                    statement.executeUpdate("UPDATE " + punishmentDB +
                             " SET decayed = true" +
                             " WHERE uuid = '" + uuid + "' AND decayed = false");
                 }
             }
 
+            // Remove "-s" from reason to make points look nicer
+            String finalReason = String.valueOf(reason);
+            if (finalReason.contains("-s")) {
+                finalReason = finalReason.replace(" -s", "");
+            }
+
             // Add points to db
-            statement.executeUpdate("INSERT INTO " + punishmentType + " (uuid, points, reason, mod, date, decayed, warning) " +
-                    "VALUES ('" + uuid + "', " + points + ", '" + reason + "', '" + mod + "', current_timestamp, false, " + warning + ")");
+            statement.executeUpdate("INSERT INTO " + punishmentDB + " (uuid, points, reason, mod, date, decayed, warning) " +
+                    "VALUES ('" + uuid + "', " + points + ", '" + finalReason + "', '" + mod + "', current_timestamp, false, " + args[0].startsWith("warn") + ")");
 
             sender.sendMessage(ChatColor.GREEN + "Player " + ChatColor.RED + player + ChatColor.GREEN + " has been given " + ChatColor.RED + points + ChatColor.GREEN + " point(s).");
 
             // Gives out the punishment -- should probably rework this monstrosity
-            if (!warning) {
+            // Check if punishment is a warning
+            if (!args[0].startsWith("warn")) {
                 if (Integer.parseInt(points) > 0) { // Do not ban people if they did not receive points
 
                     // Gets the users total current points
                     int total = 0;
+                    rs = statement.executeQuery("SELECT points FROM " + punishmentDB + " WHERE uuid='" + uuid + "' AND decayed = false");
                     while (rs.next()) {
                         total += rs.getInt("points");
                     }
 
-                    if (punishmentType.equals("bans")) {
-                        rs = statement.executeQuery("SELECT points FROM bans WHERE uuid='" + uuid + "' AND decayed = false");
+                    // Don't try to ban users with no points
+                    if (total < 1) {
+                        return;
+                    }
 
+                    if (punishmentDB.equals("bans")) {
                         // Applies the proper ban punishment to the user
                         String command;
-                        if (total > 9) { // Permanent bans are special cases
+                        if (args[0].equals("ipban")) {
+                            command = "banip " + player + " " + reason;
+                        } else if (total > 9) { // Permanent bans are special cases
                             command = "ban " + player + " " + reason;
                         } else { // Temp bans
                             command = "tempban " + player + " " + Utils.banValues.get(total) + " " + reason;
                         }
                         Bukkit.dispatchCommand(sender, command);
 
-                    } else if (punishmentType.equals("mutes")) {
-                        rs = statement.executeQuery("SELECT points FROM mutes WHERE uuid='" + uuid + "' AND decayed = false");
-
+                    } else if (punishmentDB.equals("mutes")) {
                         // Applies the proper mute punishment to the user
-                        if (total < 5) { // Tempmute
-                            String command = "tempmute " + player + " " + Utils.muteValues.get(total) + " " + reason;
-                            Bukkit.dispatchCommand(sender, command);
-                        } else if (total > 7) { // Tempban + perma mute
-                            String command = "tempban " + player + " 7d " + reason;
-                            Bukkit.dispatchCommand(sender, command);
+                        String command;
+                        if (total < 5) { // Tempmute, 1-4 points
+                             command = "tempmute " + player + " " + Utils.muteValues.get(total) + " " + reason;
+                        } else if (total > 7) { // Must perform two punishments here, tempban + perma mute
+                            String commandBan = "tempban " + player + " 7d " + reason;
+                            Bukkit.dispatchCommand(sender, commandBan);
                             command = "mute " + player + " " + reason;
-                            Bukkit.dispatchCommand(sender, command);
-                        } else { // Tempban
-                            String command = "tempban " + player + " " + Utils.muteValues.get(total) + " " + reason;
-                            Bukkit.dispatchCommand(sender, command);
+                        } else { // Tempban, 5-7 points
+                            command = "tempban " + player + " " + Utils.muteValues.get(total) + " " + reason;
                         }
+                        Bukkit.dispatchCommand(sender, command);
                     }
                 }
             }
