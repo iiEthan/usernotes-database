@@ -12,6 +12,7 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.UUID;
 
 public class DatabaseHandler {
 
@@ -279,6 +280,7 @@ public class DatabaseHandler {
                 boolean decayed = rs.getBoolean("decayed");
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("(MM/dd/yy)");
                 String date = simpleDateFormat.format(rs.getDate("date"));
+                String username = Bukkit.getOfflinePlayer(UUID.fromString(rs.getString("uuid"))).getName();
 
                 //  If the point has decayed or is a warning, it will be added to the end of the line
                 String decayFormat = (decayed) ? ChatColor.STRIKETHROUGH + "" + ChatColor.RED + " DECAYED" : "";
@@ -286,9 +288,10 @@ public class DatabaseHandler {
 
                 sender.sendMessage(
                                 ChatColor.GREEN + punishmentType.toUpperCase() + " ID #" + noteid + " " + date + ": \n" +
-                                ChatColor.BLUE + "Infraction: " + ChatColor.DARK_AQUA + reason +
-                                ChatColor.BLUE + "Points: " + ChatColor.DARK_AQUA + points + " " +
-                                ChatColor.BLUE + "Mod: " + ChatColor.DARK_AQUA + mod + warningFormat + decayFormat);
+                                ChatColor.BLUE + "Name: " + ChatColor.DARK_AQUA + username +
+                                ChatColor.BLUE + " Infraction: " + ChatColor.DARK_AQUA + reason +
+                                ChatColor.BLUE + "Points: " + ChatColor.DARK_AQUA + points +
+                                ChatColor.BLUE + " Mod: " + ChatColor.DARK_AQUA + mod + warningFormat + decayFormat);
             } else {
                 sender.sendMessage(ChatColor.RED + "ID #" + id + " not found.");
             }

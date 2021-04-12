@@ -6,9 +6,6 @@ apply plugin: 'application'
 group = 'com.rteenagers'
 version = '1.0-SNAPSHOT'
 
-mainClassName = 'SheetsQuickstart'
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
 version = '1.0'
 
 repositories {

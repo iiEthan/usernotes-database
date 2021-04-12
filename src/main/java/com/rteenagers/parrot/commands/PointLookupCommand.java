@@ -48,8 +48,8 @@ public class PointLookupCommand extends UsernotesCommand {
 
         try {
             DatabaseHandler.pointLookup(args[0], args[1], sender);
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
     }
 
