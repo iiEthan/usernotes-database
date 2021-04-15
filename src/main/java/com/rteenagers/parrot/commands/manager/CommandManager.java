@@ -68,7 +68,7 @@ public class CommandManager implements TabExecutor {
 
         // Auto-completes subcommand
         for (String arg : subcommands) {
-            if (arg.startsWith(args[args.length - 1].toLowerCase())) {
+            if (arg.toLowerCase().startsWith(args[args.length - 1].toLowerCase())) {
                 arguments.add(arg);
             }
         }

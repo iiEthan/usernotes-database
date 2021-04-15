@@ -24,7 +24,7 @@ public class PointCommand extends UsernotesCommand {
 
     @Override
     public String getInfo() {
-        return "/point [ban/mute/warnmute/warnban/ipban] [player] [amount] [reason]";
+        return "/point [ban/mute/ipban] [player] [amount] [reason]";
     }
 
     @Override
@@ -41,9 +41,9 @@ public class PointCommand extends UsernotesCommand {
     public void execute(CommandSender sender, String[] args) {
 
         // Check if correct punishment type is given
-        String[] punishments = {"ban", "mute", "warnban", "warnmute", "ipban"};
+        String[] punishments = {"ban", "mute", "ipban"};
         if (!Arrays.asList(punishments).contains(args[0])) {
-            sender.sendMessage(ChatColor.RED + "Invalid syntax. Please enter " + ChatColor.DARK_RED + "[ban/mute/warnban/warnmute/ipban] " + ChatColor.RED + "as the first argument.");
+            sender.sendMessage(ChatColor.RED + "Invalid syntax. Please enter " + ChatColor.DARK_RED + "[ban/mute/ipban] " + ChatColor.RED + "as the first argument.");
             return;
         }
 
@@ -51,7 +51,6 @@ public class PointCommand extends UsernotesCommand {
             sender.sendMessage(ChatColor.RED + "Invalid syntax. Please provide a valid number as your third argument.");
             return;
         }
-
         // Parses reason into its own string
         StringBuilder reason = new StringBuilder();
         for (int i = 3; i < args.length; i++) {
@@ -75,10 +74,10 @@ public class PointCommand extends UsernotesCommand {
                 }
 
                 // Gives out the punishment -- should probably rework this monstrosity
-                if ((!args[0].startsWith("warn")) || !(points < 1)) {
+                if (!reason.toString().contains(" -w")) {
+                    String command = null;
                     if (punishmentDB.equals("bans")) {
                         // Applies the proper ban punishment to the user
-                        String command;
                         if (args[0].equals("ipban")) {
                             command = "banip " + player + " " + reason;
                         } else if (points > 9) { // Permanent bans are special cases
@@ -86,11 +85,9 @@ public class PointCommand extends UsernotesCommand {
                         } else { // Temp bans
                             command = "tempban " + player + " " + Utils.banValues.get(points) + " " + reason;
                         }
-                        Bukkit.dispatchCommand(sender, command);
 
                     } else if (punishmentDB.equals("mutes")) {
                         // Applies the proper mute punishment to the user
-                        String command;
                         if (points < 5) { // Tempmute, 1-4 points
                             command = "tempmute " + player + " " + Utils.muteValues.get(points) + " " + reason;
                         } else if (points > 7) { // Must perform two punishments here, tempban + perma mute
@@ -100,8 +97,15 @@ public class PointCommand extends UsernotesCommand {
                         } else { // Tempban, 5-7 points
                             command = "tempban " + player + " " + Utils.muteValues.get(points) + " " + reason;
                         }
-                        Bukkit.dispatchCommand(sender, command);
                     }
+                    // Remove -w and -f flags from final reasoning
+                    String[] flagOptions = {"-f", "-w"};
+                    for (String flag : flagOptions) {
+                        if (command.contains(" " + flag)) {
+                            command = command.replace(" " + flag, "");
+                        }
+                    }
+                    Bukkit.dispatchCommand(sender, command);
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -119,7 +123,7 @@ public class PointCommand extends UsernotesCommand {
 
         switch (args.length) {
             case 1:
-                return Arrays.asList("ban", "mute", "warnban", "warnmute", "ipban");
+                return Arrays.asList("ban", "mute", "ipban");
             case 2:
                 for (Player p : Bukkit.getOnlinePlayers()) {
                         arguments.add(p.getName());
@@ -132,9 +136,9 @@ public class PointCommand extends UsernotesCommand {
                 }
                 return arguments;
             case 4:
-                return Collections.singletonList("reason");
+                return Collections.singletonList("<reason>");
             default:
-                return Collections.singletonList("-s");
+                return Arrays.asList("-s", "-f", "-w");
         }
     }
 }

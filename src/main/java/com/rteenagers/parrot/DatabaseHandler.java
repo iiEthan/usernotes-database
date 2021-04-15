@@ -154,14 +154,17 @@ public class DatabaseHandler {
                 String mod = sender.getName();
 
                 // check if users already are being punished to prevent double pointing
-                if (punishmentDB.equals("bans")) {
-                    if (Database.get().isPlayerBanned(UUID.fromString(uuid), null)) {
-                        sender.sendMessage(ChatColor.RED + "User is already currently serving a ban punishment.");
-                        return;
-                    } else {
-                        if (Database.get().isPlayerMuted(UUID.fromString(uuid), null)) {
-                            sender.sendMessage(ChatColor.RED + "User is already currently serving a mute punishment.");
+                // -f tag will ignore this check
+                if (!reason.toString().contains(" -f")) {
+                    if (punishmentDB.equals("bans")) {
+                        if (Database.get().isPlayerBanned(UUID.fromString(uuid), null)) {
+                            sender.sendMessage(ChatColor.RED + "User is already currently serving a ban punishment.");
                             return;
+                        } else {
+                            if (Database.get().isPlayerMuted(UUID.fromString(uuid), null)) {
+                                sender.sendMessage(ChatColor.RED + "User is already currently serving a mute punishment.");
+                                return;
+                            }
                         }
                     }
                 }
@@ -185,15 +188,18 @@ public class DatabaseHandler {
                     }
                 }
 
-                // Remove "-s" from reason to make points look nicer
+                // Remove flags from final reasoning
+                String[] flagOptions = {"-f", "-s", "-w"};
                 String finalReason = String.valueOf(reason);
-                if (finalReason.contains("-s")) {
-                    finalReason = finalReason.replace(" -s", "");
+                for (String flag : flagOptions) {
+                    if (finalReason.contains(" " + flag)) {
+                        finalReason = finalReason.replace(" " + flag, "");
+                    }
                 }
 
                 // Add points to db
                 statement.executeUpdate("INSERT INTO " + punishmentDB + " (uuid, points, reason, mod, date, decayed, warning) " +
-                        "VALUES ('" + uuid + "', " + points + ", '" + finalReason + "', '" + mod + "', current_timestamp, false, " + args[0].startsWith("warn") + ")");
+                        "VALUES ('" + uuid + "', " + points + ", '" + finalReason + "', '" + mod + "', current_timestamp, false, " + reason.toString().contains(" -w") + ")");
 
                 sender.sendMessage(ChatColor.GREEN + "Player " + ChatColor.RED + args[1] + ChatColor.GREEN + " has been given " + ChatColor.RED + points + ChatColor.GREEN + " point(s).");
 
