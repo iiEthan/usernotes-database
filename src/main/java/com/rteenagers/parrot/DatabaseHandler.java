@@ -1,5 +1,6 @@
 package com.rteenagers.parrot;
 
+import litebans.api.Database;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -146,12 +147,24 @@ public class DatabaseHandler {
                 DatabaseHandler.openConnection();
                 statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 
-
                 @SuppressWarnings("deprecation")
                 String uuid = String.valueOf(Bukkit.getOfflinePlayer(args[1]).getUniqueId());
                 String punishmentDB = args[0].contains("ban") ? "bans" : "mutes";
                 String points = args[2];
                 String mod = sender.getName();
+
+                // check if users already are being punished to prevent double pointing
+                if (punishmentDB.equals("bans")) {
+                    if (Database.get().isPlayerBanned(UUID.fromString(uuid), null)) {
+                        sender.sendMessage(ChatColor.RED + "User is already currently serving a ban punishment.");
+                        return;
+                    } else {
+                        if (Database.get().isPlayerMuted(UUID.fromString(uuid), null)) {
+                            sender.sendMessage(ChatColor.RED + "User is already currently serving a mute punishment.");
+                            return;
+                        }
+                    }
+                }
 
                 // First, we need to check if the users points have decayed. This will be easier for when we parse the dataset later.
                 rs = statement.executeQuery("SELECT date FROM " + punishmentDB + " WHERE uuid='" + uuid + "' AND decayed = false");

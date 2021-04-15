@@ -133,10 +133,8 @@ public class PointCommand extends UsernotesCommand {
                 return arguments;
             case 4:
                 return Collections.singletonList("reason");
-            case 5:
-                return Collections.singletonList("-s");
             default:
-                return new ArrayList<>();
+                return Collections.singletonList("-s");
         }
     }
 }
