@@ -9,7 +9,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -43,11 +42,8 @@ public class PointsCommand extends UsernotesCommand {
             OfflinePlayer op = Bukkit.getOfflinePlayer(sender.getName());
             UUID uuid = op.getUniqueId();
 
-            try {
-                DatabaseHandler.getPoints(String.valueOf(uuid), op.getName(), sender);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            DatabaseHandler.getPoints(String.valueOf(uuid), op.getName(), sender);
+
             return;
         }
 
@@ -58,15 +54,11 @@ public class PointsCommand extends UsernotesCommand {
         }
 
         String target = args[0];
-
         @SuppressWarnings("deprecation")
         OfflinePlayer op = Bukkit.getOfflinePlayer(target); // Deprecated but should work without worry of it being removed, please replace if there's a better way to get someones UUID :^)
         UUID uuid = op.getUniqueId();
-        try {
-            DatabaseHandler.getPoints(String.valueOf(uuid), target, sender);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+
+        DatabaseHandler.getPoints(String.valueOf(uuid), target, sender);
     }
 
     @Override

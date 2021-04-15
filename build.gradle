@@ -19,12 +19,17 @@ repositories {
         name = 'sonatype'
         url = 'https://oss.sonatype.org/content/groups/public/'
     }
+    maven {
+        name = 'jitpack.io'
+        url = 'https://jitpack.io'
+    }
 }
 
 dependencies {
     compile 'org.spigotmc:spigot-api:1.16.5-R0.1-SNAPSHOT'
     compile group: 'org.postgresql', name: 'postgresql', version: '42.2.16'
     implementation group: 'commons-dbcp', name: 'commons-dbcp', version: '1.4'
+    compile 'com.gitlab.ruany:LiteBansAPI:0.3.4'
 }
 
 processResources {

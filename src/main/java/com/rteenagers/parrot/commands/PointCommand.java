@@ -52,11 +52,65 @@ public class PointCommand extends UsernotesCommand {
             return;
         }
 
-        try {
-            DatabaseHandler.addPoints(args, sender);
-        } catch (SQLException e) {
-            e.printStackTrace();
+        // Parses reason into its own string
+        StringBuilder reason = new StringBuilder();
+        for (int i = 3; i < args.length; i++) {
+            reason.append(args[i]).append(" ");
         }
+        String player = args[1];
+        String punishmentDB = args[0].contains("ban") ? "bans" : "mutes";
+
+        DatabaseHandler.addPoints(args, sender, reason, rs -> {
+            try {
+
+                // Gets the users total current points
+                int points = 0;
+                while (rs.next()) {
+                    points += rs.getInt("points");
+                }
+                // Don't try to ban users with no points
+                if (points < 1) {
+                    sender.sendMessage(ChatColor.RED + "User has less than 1 point. No punishment will be given!");
+                    return;
+                }
+
+                // Gives out the punishment -- should probably rework this monstrosity
+                if ((!args[0].startsWith("warn")) || !(points < 1)) {
+                    if (punishmentDB.equals("bans")) {
+                        // Applies the proper ban punishment to the user
+                        String command;
+                        if (args[0].equals("ipban")) {
+                            command = "banip " + player + " " + reason;
+                        } else if (points > 9) { // Permanent bans are special cases
+                            command = "ban " + player + " " + reason;
+                        } else { // Temp bans
+                            command = "tempban " + player + " " + Utils.banValues.get(points) + " " + reason;
+                        }
+                        Bukkit.dispatchCommand(sender, command);
+
+                    } else if (punishmentDB.equals("mutes")) {
+                        // Applies the proper mute punishment to the user
+                        String command;
+                        if (points < 5) { // Tempmute, 1-4 points
+                            command = "tempmute " + player + " " + Utils.muteValues.get(points) + " " + reason;
+                        } else if (points > 7) { // Must perform two punishments here, tempban + perma mute
+                            String commandBan = "tempban " + player + " 7d " + reason;
+                            Bukkit.dispatchCommand(sender, commandBan);
+                            command = "mute " + player + " " + reason;
+                        } else { // Tempban, 5-7 points
+                            command = "tempban " + player + " " + Utils.muteValues.get(points) + " " + reason;
+                        }
+                        Bukkit.dispatchCommand(sender, command);
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                DatabaseHandler.rs.close();
+                DatabaseHandler.statement.close();
+                DatabaseHandler.connection.close();
+            }
+        });
     }
 
     @Override

@@ -7,7 +7,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -46,11 +45,7 @@ public class PointLookupCommand extends UsernotesCommand {
             return;
         }
 
-        try {
-            DatabaseHandler.pointLookup(args[0], args[1], sender);
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
+        DatabaseHandler.pointLookup(args[0], args[1], sender);
     }
 
     @Override

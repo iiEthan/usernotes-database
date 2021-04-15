@@ -3,6 +3,8 @@ package com.rteenagers.parrot;
 // This class just makes a dictionary for the ban values. It is its own class for the sake of cleanliness
 // Note: the last point on both hashes are missing because they are special cases
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Dictionary;
 import java.util.Hashtable;
 
@@ -50,5 +52,11 @@ public class Utils {
             if (Character.digit(s.charAt(i), radix) < 0) return false;
         }
         return true;
+    }
+
+    public interface FindOneCallback {
+
+        void onQueryDone(ResultSet result) throws SQLException;
+
     }
 }

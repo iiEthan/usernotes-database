@@ -7,7 +7,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -47,11 +46,7 @@ public class RemovePointCommand extends UsernotesCommand {
             return;
         }
 
-        try {
             DatabaseHandler.removePoints(args[0], args[1], sender);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
