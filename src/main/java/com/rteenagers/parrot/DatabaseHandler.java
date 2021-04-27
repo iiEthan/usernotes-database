@@ -92,9 +92,13 @@ public class DatabaseHandler {
         Bukkit.getScheduler().runTaskAsynchronously(Usernotes.getInstance(), () -> {
             try {
                 DatabaseHandler.openConnection();
-                statement = connection.createStatement();
+                statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 
                 for (String punishmentType : new String[]{"mute", "ban"}) {
+
+
+                    rs = statement.executeQuery("SELECT date FROM " + punishmentType + "s WHERE uuid='" + uuid + "' AND decayed = false");
+                    checkDecay(rs, punishmentType + "s", uuid);
 
                     // Display points
                     rs = statement.executeQuery("SELECT * FROM " + punishmentType + "S WHERE uuid='" + uuid + "'");
@@ -117,7 +121,7 @@ public class DatabaseHandler {
                             String decayFormat = (decayed) ? ChatColor.STRIKETHROUGH + "" + ChatColor.RED + " DECAYED" : "";
                             String warningFormat = (warning) ? ChatColor.BOLD + "" + ChatColor.YELLOW + " (Warning)" : "";
 
-                            sender.sendMessage(decayFormat +
+                            sender.sendMessage(
                                     ChatColor.GREEN + punishmentType.toUpperCase() + " ID #" + noteid + " " + date + ":\n" +
                                     ChatColor.BLUE + "Infraction: " + ChatColor.DARK_AQUA + reason +
                                     ChatColor.BLUE + "Points: " + ChatColor.DARK_AQUA + points + " " +
@@ -171,22 +175,7 @@ public class DatabaseHandler {
 
                 // First, we need to check if the users points have decayed. This will be easier for when we parse the dataset later.
                 rs = statement.executeQuery("SELECT date FROM " + punishmentDB + " WHERE uuid='" + uuid + "' AND decayed = false");
-
-                if (rs.next()) { // Make sure there are logs
-                    rs.last();
-
-                    // Converts and compares dates
-                    LocalDate then = LocalDate.parse(rs.getDate("date").toLocalDate().toString());
-                    LocalDate now = LocalDate.now();
-                    long daysBetween = ChronoUnit.DAYS.between(then, now);
-
-                    // If the previous punishment exceeds decay requirement, we will decay all of their current points
-                    if (daysBetween > Utils.decayValues.get(punishmentDB)) {
-                        statement.executeUpdate("UPDATE " + punishmentDB +
-                                " SET decayed = true" +
-                                " WHERE uuid = '" + uuid + "' AND decayed = false");
-                    }
-                }
+                checkDecay(rs, punishmentDB, uuid);
 
                 // Remove flags from final reasoning
                 String[] flagOptions = {"-f", "-s", "-w"};
@@ -301,5 +290,27 @@ public class DatabaseHandler {
                 }
             }
         });
+    }
+
+    public static void checkDecay(ResultSet rs, String punishmentDB, String uuid) {
+        try {
+            if (rs.next()) { // Make sure there are logs
+                rs.last();
+
+                // Converts and compares dates
+                LocalDate then = LocalDate.parse(rs.getDate("date").toLocalDate().toString());
+                LocalDate now = LocalDate.now();
+                long daysBetween = ChronoUnit.DAYS.between(then, now);
+
+                // If the previous punishment exceeds decay requirement, we will decay all of their current points
+                if (daysBetween > Utils.decayValues.get(punishmentDB)) {
+                    statement.executeUpdate("UPDATE " + punishmentDB +
+                            " SET decayed = true" +
+                            " WHERE uuid = '" + uuid + "' AND decayed = false");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
