@@ -44,18 +44,14 @@ public class DatabaseHandler {
     }
 
     // Connects to the database
-    public static void openConnection() {
+    public static void openConnection() throws ClassNotFoundException, SQLException {
         BasicDataSource dataSource = DatabaseHandler.getDataSource();
-        try {
             Class.forName("org.postgresql.Driver");
             connection = dataSource.getConnection();
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
     }
 
     // Creates the tables if there aren't any already
-    public static void createTables() throws SQLException {
+    public static void createTables() throws SQLException, ClassNotFoundException {
         DatabaseHandler.openConnection();
         statement = connection.createStatement();
 
@@ -96,7 +92,6 @@ public class DatabaseHandler {
 
                 for (String punishmentType : new String[]{"mute", "ban"}) {
 
-
                     rs = statement.executeQuery("SELECT date FROM " + punishmentType + "s WHERE uuid='" + uuid + "' AND decayed = false");
                     checkDecay(rs, punishmentType + "s", uuid);
 
@@ -130,7 +125,7 @@ public class DatabaseHandler {
                         }
                     }
                 }
-            } catch (SQLException e) {
+            } catch (SQLException | ClassNotFoundException e) {
                 sender.sendMessage("An error has occurred!");
                 e.printStackTrace();
             } finally {
@@ -162,11 +157,11 @@ public class DatabaseHandler {
                 if (!reason.toString().contains(" -f")) {
                     if (punishmentDB.equals("bans")) {
                         if (Database.get().isPlayerBanned(UUID.fromString(uuid), null)) {
-                            sender.sendMessage(ChatColor.RED + "User is already currently serving a ban punishment.");
+                            sender.sendMessage(ChatColor.RED + "User is already currently serving a ban punishment. Use the -f tag to force the punishment anyway.");
                             return;
                         } else {
                             if (Database.get().isPlayerMuted(UUID.fromString(uuid), null)) {
-                                sender.sendMessage(ChatColor.RED + "User is already currently serving a mute punishment.");
+                                sender.sendMessage(ChatColor.RED + "User is already currently serving a mute punishment. Use the -f tag to force the punishment anyway.");
                                 return;
                             }
                         }
@@ -201,7 +196,7 @@ public class DatabaseHandler {
                         e.printStackTrace();
                     }
                 });
-            } catch (SQLException e) {
+            } catch (SQLException | ClassNotFoundException e) {
                 e.printStackTrace();
                 try {
                     rs.close();
@@ -228,7 +223,7 @@ public class DatabaseHandler {
                 statement.executeUpdate("DELETE FROM " + punishmentType + "s WHERE " + punishmentType + "id='" + id + "'");
                 sender.sendMessage(ChatColor.GREEN + "Removed " + punishmentType + " ID #" + id + " from database.");
             }
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
             sender.sendMessage("An error has occurred!");
         } finally {
@@ -277,7 +272,7 @@ public class DatabaseHandler {
                     sender.sendMessage(ChatColor.RED + "ID #" + id + " not found.");
                 }
 
-            } catch (SQLException e) {
+            } catch (SQLException | ClassNotFoundException e) {
                 e.printStackTrace();
                 sender.sendMessage("An error has occurred!");
             } finally {

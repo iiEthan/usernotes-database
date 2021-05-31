@@ -20,7 +20,7 @@ public final class Usernotes extends JavaPlugin {
         // Register Database
         try {
             DatabaseHandler.createTables();
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
         getLogger().info("Connection to usernotes database successfully made");

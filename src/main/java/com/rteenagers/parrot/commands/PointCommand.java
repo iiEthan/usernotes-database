@@ -59,14 +59,15 @@ public class PointCommand extends UsernotesCommand {
         String player = args[1];
         String punishmentDB = args[0].contains("ban") ? "bans" : "mutes";
 
+        // Async to not lag the server
         DatabaseHandler.addPoints(args, sender, reason, rs -> {
             try {
-
                 // Gets the users total current points
                 int points = 0;
                 while (rs.next()) {
                     points += rs.getInt("points");
                 }
+
                 // Don't try to ban users with no points
                 if (points < 1) {
                     sender.sendMessage(ChatColor.RED + "User has less than 1 point. No punishment will be given!");
