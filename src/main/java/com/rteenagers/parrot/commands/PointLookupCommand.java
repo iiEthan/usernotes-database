@@ -50,13 +50,10 @@ public class PointLookupCommand extends UsernotesCommand {
 
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String alias, String[] args) {
-        switch (args.length) {
-            case 1:
-                return Arrays.asList("ban", "mute");
-            case 2:
-                return Collections.singletonList("noteid");
-            default:
-                return new ArrayList<>();
-        }
+        return switch (args.length) {
+            case 1 -> Arrays.asList("ban", "mute");
+            case 2 -> Collections.singletonList("noteid");
+            default -> new ArrayList<>();
+        };
     }
 }

@@ -55,8 +55,6 @@ public class Utils {
     }
 
     public interface FindOneCallback {
-
         void onQueryDone(ResultSet result) throws SQLException;
-
     }
 }
