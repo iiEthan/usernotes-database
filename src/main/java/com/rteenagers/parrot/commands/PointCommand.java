@@ -70,7 +70,7 @@ public class PointCommand extends UsernotesCommand {
 
                 // Don't try to ban users with no points
                 if (points < 1) {
-                    sender.sendMessage(ChatColor.RED + "User has less than 1 point. No punishment will be given!");
+                    sender.sendMessage(ChatColor.RED + "User has less than 1 point. No punishment will be given.");
                     return;
                 }
 

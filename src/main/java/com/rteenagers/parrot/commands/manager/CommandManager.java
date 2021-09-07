@@ -1,15 +1,13 @@
 package com.rteenagers.parrot.commands.manager;
 
 import com.rteenagers.parrot.Usernotes;
-import com.rteenagers.parrot.commands.PointCommand;
-import com.rteenagers.parrot.commands.PointLookupCommand;
-import com.rteenagers.parrot.commands.PointsCommand;
-import com.rteenagers.parrot.commands.RemovePointCommand;
+import com.rteenagers.parrot.commands.*;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabExecutor;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,11 +20,15 @@ public class CommandManager implements TabExecutor {
         plugin.getCommand("point").setExecutor(this);
         plugin.getCommand("points").setExecutor(this);
         plugin.getCommand("removepoint").setExecutor(this);
+        plugin.getCommand("pointlist").setExecutor(this);
+        plugin.getCommand("resetpoints").setExecutor(this);
 
         this.commands.add(new PointLookupCommand());
         this.commands.add(new PointCommand());
         this.commands.add(new PointsCommand());
         this.commands.add(new RemovePointCommand());
+        this.commands.add(new PointListCommand());
+        this.commands.add(new ResetPointsCommand());
     }
 
     @Override
@@ -46,7 +48,11 @@ public class CommandManager implements TabExecutor {
             return true;
         }
 
-        usernotesCommand.execute(sender, args);
+        try {
+            usernotesCommand.execute(sender, args);
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         return true;
     }
 

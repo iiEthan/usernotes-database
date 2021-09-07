@@ -1,5 +1,5 @@
 name: Usernotes
-version: 1.2.0
+version: 1.3.0
 main: com.rteenagers.parrot.Usernotes
 api-version: "1.17"
 description: Manages usernotes database for in-game use
@@ -19,16 +19,26 @@ commands:
   pointlookup:
     description: View a specific note
     usage: "/pointlookup [ban/mute] [id]"
-    aliases: [lookuppoint, lp]
+    aliases: [lookuppoint]
+  pointlist:
+    description: View a list of all notes
+    usage: "/pointlist"
+    aliases: [listpoints]
+  resetpoints:
+    description: Resets database
+    usage: "/resetpoints confirm"
 
 permissions:
   points.edit:
     description: Allows users to add or remove points
     default: op
-  points.lookup.all:
+  points.lookup:
     description: Allows users to search up anyones points
     default: op
   points.lookup.self:
     description: Allows users to search up their own points
     default: true
+  points.admin:
+    description: Allows users to reset the database
+    default: op
 

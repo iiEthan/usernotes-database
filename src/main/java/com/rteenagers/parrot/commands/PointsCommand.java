@@ -55,7 +55,7 @@ public class PointsCommand extends UsernotesCommand {
 
         String target = args[0];
         @SuppressWarnings("deprecation")
-        OfflinePlayer op = Bukkit.getOfflinePlayer(target); // Deprecated but should work without worry of it being removed, please replace if there's a better way to get someones UUID :^)
+        OfflinePlayer op = Bukkit.getOfflinePlayer(target); // Deprecated but should work without worry of it being removed, please replace if there's a better way to get someone's UUID :^)
         UUID uuid = op.getUniqueId();
 
         DatabaseHandler.getPoints(String.valueOf(uuid), target, sender);

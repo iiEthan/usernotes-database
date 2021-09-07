@@ -6,10 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -20,6 +17,7 @@ public class DatabaseHandler {
     public static BasicDataSource dataSource;
     public static Connection connection;
     public static Statement statement;
+    public static PreparedStatement preparedStatement;
     public static ResultSet rs;
 
     // Gets database pooling connection
@@ -84,6 +82,24 @@ public class DatabaseHandler {
         }
     }
 
+    public static void resetTables() throws SQLException, ClassNotFoundException {
+        DatabaseHandler.openConnection();
+        statement = connection.createStatement();
+
+        try {
+            statement.executeUpdate("DROP TABLE bans");
+            statement.executeUpdate("DROP TABLE mutes");
+
+            DatabaseHandler.createTables();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            statement.close();
+            connection.close();
+        }
+    }
+
     public static void getPoints(String uuid, String player, CommandSender sender) {
         Bukkit.getScheduler().runTaskAsynchronously(Usernotes.getInstance(), () -> {
             try {
@@ -92,6 +108,7 @@ public class DatabaseHandler {
 
                 for (String punishmentType : new String[]{"mute", "ban"}) {
 
+                    // Checks decay
                     rs = statement.executeQuery("SELECT date FROM " + punishmentType + "s WHERE uuid='" + uuid + "' AND decayed = false");
                     checkDecay(rs, punishmentType + "s", uuid);
 
@@ -182,8 +199,21 @@ public class DatabaseHandler {
                 }
 
                 // Add points to db
-                statement.executeUpdate("INSERT INTO " + punishmentDB + " (uuid, points, reason, mod, date, decayed, warning) " +
-                        "VALUES ('" + uuid + "', " + points + ", '" + finalReason + "', '" + mod + "', current_timestamp, false, " + reason.toString().contains(" -w") + ")");
+                String sql = "INSERT INTO " + punishmentDB + " (uuid, points, reason, mod, date, decayed, warning) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+                preparedStatement = connection.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+
+                preparedStatement.setString(1, uuid);
+                preparedStatement.setInt(2, Integer.parseInt(points));
+                preparedStatement.setString(3, finalReason);
+                preparedStatement.setString(4, mod);
+                preparedStatement.setTimestamp(5, new Timestamp(System.currentTimeMillis()));
+                preparedStatement.setBoolean(6, false);
+                preparedStatement.setBoolean(7, reason.toString().contains(" -w"));
+
+                preparedStatement.executeUpdate();
+
 
                 sender.sendMessage(ChatColor.GREEN + "Player " + ChatColor.RED + args[1] + ChatColor.GREEN + " has been given " + ChatColor.RED + points + ChatColor.GREEN + " point(s).");
 
@@ -201,6 +231,7 @@ public class DatabaseHandler {
                 try {
                     rs.close();
                     statement.close();
+                    preparedStatement.close();
                     connection.close();
                 } catch (SQLException f) {
                     f.printStackTrace();
@@ -307,5 +338,58 @@ public class DatabaseHandler {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public static void getPointList(String punishmentType, String pageNumber, CommandSender sender) {
+        Bukkit.getScheduler().runTaskAsynchronously(Usernotes.getInstance(), () -> {
+            try {
+                DatabaseHandler.openConnection();
+                statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+
+                int offset = (Integer.parseInt(pageNumber) - 1) * 5; // How many rows to ignore
+
+                rs = statement.executeQuery("SELECT * from " + punishmentType + "s ORDER BY " + punishmentType + "id DESC LIMIT 5" + " OFFSET " + offset);
+
+                if (!rs.isBeforeFirst()) { // Checks if points exist
+                    sender.sendMessage(ChatColor.RED + "No " + punishmentType + " points were found in the database.");
+                } else {
+                    while (rs.next()) {
+
+                        // Retrieves point information
+                        int noteid = rs.getInt(punishmentType + "id");
+                        int points = rs.getInt("points");
+                        String reason = rs.getString("reason");
+                        String mod = rs.getString("mod");
+                        boolean warning = rs.getBoolean("warning");
+                        boolean decayed = rs.getBoolean("decayed");
+                        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("(MM/dd/yy)");
+                        String date = simpleDateFormat.format(rs.getDate("date"));
+                        String username = Bukkit.getOfflinePlayer(UUID.fromString(rs.getString("uuid"))).getName();
+
+                        //  If the point has decayed or is a warning, it will be added to the end of the line
+                        String decayFormat = (decayed) ? ChatColor.STRIKETHROUGH + "" + ChatColor.RED + " DECAYED" : "";
+                        String warningFormat = (warning) ? ChatColor.BOLD + "" + ChatColor.YELLOW + " (Warning)" : "";
+
+                        sender.sendMessage(
+                                ChatColor.GREEN + punishmentType.toUpperCase() + " ID #" + noteid + " " + date + ": \n" +
+                                        ChatColor.BLUE + "Name: " + ChatColor.DARK_AQUA + username +
+                                        ChatColor.BLUE + " Infraction: " + ChatColor.DARK_AQUA + reason +
+                                        ChatColor.BLUE + "Points: " + ChatColor.DARK_AQUA + points +
+                                        ChatColor.BLUE + " Mod: " + ChatColor.DARK_AQUA + mod + warningFormat + decayFormat);
+                    }
+                }
+            } catch (SQLException | ClassNotFoundException e) {
+                e.printStackTrace();
+                sender.sendMessage("An error has occurred!");
+            } finally {
+                try {
+                    rs.close();
+                    statement.close();
+                    connection.close();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }
